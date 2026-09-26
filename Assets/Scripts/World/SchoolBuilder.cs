@@ -173,7 +173,10 @@ namespace JuiceGalaxy
         static void BuildFirstFloor(Transform root, float length, float depth, Material wallMat)
         {
             const float floorHeight = 3f;
-            PrimBuilder.Cube(root, "FirstFloor", new Vector3(0, -floorHeight / 2f, 0), new Vector3(length, floorHeight, depth), wallMat);
+            // Dropped slightly below y=0 so its top face doesn't sit exactly coplanar with the
+            // classroom Floor plane above - that coincidence was causing the floor to z-fight/flicker.
+            const float clearance = 0.05f;
+            PrimBuilder.Cube(root, "FirstFloor", new Vector3(0, -floorHeight / 2f - clearance, 0), new Vector3(length, floorHeight, depth), wallMat);
         }
 
         static void BuildDesks(Transform root)

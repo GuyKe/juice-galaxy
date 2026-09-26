@@ -20,8 +20,10 @@ namespace JuiceGalaxy
             Vector3 playgroundCenter = new Vector3(-3.5f, 0f, -12f);
             var playground = PlaygroundBuilder.Build(worldRoot, playgroundCenter);
 
-            Vector3 islandCenter = new Vector3(-1.5f, 0f, -6f);
-            PlanetoidFieldBuilder.Build(worldRoot, islandCenter, new Vector2(60f, 64f));
+            // Centered and sized to stay hidden under both the school and the now much longer
+            // playground field, so flying around outside doesn't reveal an unsupported floating edge.
+            Vector3 islandCenter = new Vector3(-3.5f, 0f, -71f);
+            PlanetoidFieldBuilder.Build(worldRoot, islandCenter, new Vector2(60f, 160f));
 
             return new Result
             {

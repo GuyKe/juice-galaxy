@@ -18,8 +18,9 @@ namespace JuiceGalaxy
             var whiteMat = MaterialUtil.CreateLit(new Color(0.93f, 0.9f, 0.85f));
             var blackMat = MaterialUtil.CreateLit(new Color(0.03f, 0.03f, 0.03f));
 
-            const float bodyRadius = 0.42f;
-            const float headRadius = 0.22f;
+            const float scale = 1.7f;
+            const float bodyRadius = 0.42f * scale;
+            const float headRadius = 0.22f * scale;
 
             var body = new GameObject("Body").transform;
             body.SetParent(root, false);
@@ -57,20 +58,20 @@ namespace JuiceGalaxy
             tailRoot.SetParent(body, false);
             tailRoot.localPosition = new Vector3(bodyRadius * 0.3f, bodyRadius * 0.7f, -bodyRadius * 0.3f);
 
-            AddCappedLimb(root, "LeftArm", leftShoulder, 3, 0.16f, 0.09f, 0.05f, darkMat, whiteMat);
-            AddCappedLimb(root, "RightArm", rightShoulder, 3, 0.16f, 0.09f, 0.05f, darkMat, whiteMat);
-            AddCappedLimb(root, "LeftLeg", leftHip, 3, 0.15f, 0.08f, 0.05f, darkMat, whiteMat);
-            AddCappedLimb(root, "RightLeg", rightHip, 3, 0.15f, 0.08f, 0.05f, darkMat, whiteMat);
-            AddCappedLimb(root, "Tail", tailRoot, 3, 0.13f, 0.05f, 0.02f, darkMat, whiteMat);
+            AddCappedLimb(root, "LeftArm", leftShoulder, 3, 0.16f * scale, 0.09f * scale, 0.05f * scale, darkMat, whiteMat);
+            AddCappedLimb(root, "RightArm", rightShoulder, 3, 0.16f * scale, 0.09f * scale, 0.05f * scale, darkMat, whiteMat);
+            AddCappedLimb(root, "LeftLeg", leftHip, 3, 0.15f * scale, 0.08f * scale, 0.05f * scale, darkMat, whiteMat);
+            AddCappedLimb(root, "RightLeg", rightHip, 3, 0.15f * scale, 0.08f * scale, 0.05f * scale, darkMat, whiteMat);
+            AddCappedLimb(root, "Tail", tailRoot, 3, 0.13f * scale, 0.05f * scale, 0.02f * scale, darkMat, whiteMat);
 
-            var label = WorldSpaceLabel.Create(body, new Vector3(0, 0.95f, 0), "Ingot", new Color(0.95f, 0.9f, 0.8f));
+            var label = WorldSpaceLabel.Create(body, new Vector3(0, 0.95f * scale, 0), "Ingot", new Color(0.95f, 0.9f, 0.8f));
 
-            var promptLabel = WorldSpaceLabel.Create(body, new Vector3(0, 0.72f, 0), "", Color.white, 32, 0.2f);
+            var promptLabel = WorldSpaceLabel.Create(body, new Vector3(0, 0.72f * scale, 0), "", Color.white, 32, 0.2f);
             promptLabel.SetVisible(false);
 
             var trigger = root.gameObject.AddComponent<SphereCollider>();
             trigger.isTrigger = true;
-            trigger.radius = 3f;
+            trigger.radius = 3f * Mathf.Max(1f, scale * 0.7f);
             trigger.center = new Vector3(0, bodyRadius, 0);
             var rb = root.gameObject.AddComponent<Rigidbody>();
             rb.isKinematic = true;
