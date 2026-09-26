@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JuiceGalaxy
 {
-    /// <summary>A small bizarre blob creature roaming the planetoids - the game's basic enemy.</summary>
+    /// <summary>A small bizarre blob creature roaming the playground - the game's basic enemy.</summary>
     public static class WobblyCreature
     {
         public static Transform Spawn(Transform parent, Vector3 position, Color color)

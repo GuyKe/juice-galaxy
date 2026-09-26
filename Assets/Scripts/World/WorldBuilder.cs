@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JuiceGalaxy
 {
-    /// <summary>Top-level world assembly: school, playground, and the surrounding galaxy of planetoids.</summary>
+    /// <summary>Top-level world assembly: school, playground, and the surrounding starfield.</summary>
     public static class WorldBuilder
     {
         public class Result
@@ -22,9 +22,9 @@ namespace JuiceGalaxy
             var playground = PlaygroundBuilder.Build(worldRoot, playgroundCenter);
 
             Vector3 islandCenter = new Vector3(-1.5f, 0f, -6f);
-            var planetoids = PlanetoidFieldBuilder.Build(worldRoot, islandCenter, new Vector2(26f, 30f));
+            PlanetoidFieldBuilder.Build(worldRoot, islandCenter, new Vector2(26f, 30f));
 
-            SpawnCreatures(worldRoot, playgroundCenter, planetoids);
+            SpawnCreatures(worldRoot, playgroundCenter);
 
             return new Result
             {
@@ -34,7 +34,7 @@ namespace JuiceGalaxy
             };
         }
 
-        static void SpawnCreatures(Transform worldRoot, Vector3 playgroundCenter, System.Collections.Generic.List<Transform> planetoids)
+        static void SpawnCreatures(Transform worldRoot, Vector3 playgroundCenter)
         {
             var palette = new[]
             {
@@ -43,21 +43,6 @@ namespace JuiceGalaxy
 
             WobblyCreature.Spawn(worldRoot, playgroundCenter + new Vector3(7f, 0f, 3f), palette[0]);
             WobblyCreature.Spawn(worldRoot, playgroundCenter + new Vector3(-8f, 0f, 4f), palette[1]);
-
-            for (int i = 0; i < planetoids.Count; i++)
-            {
-                if (i % 2 != 0) continue;
-                var p = planetoids[i];
-                Vector3 spawnPos = p.position + Vector3.up * (EstimateRadius(p) + 0.4f);
-                WobblyCreature.Spawn(worldRoot, spawnPos, palette[i % palette.Length]);
-            }
-        }
-
-        static float EstimateRadius(Transform planetoid)
-        {
-            var mf = planetoid.GetComponent<MeshFilter>();
-            if (mf != null && mf.sharedMesh != null) return mf.sharedMesh.bounds.extents.magnitude * 0.6f;
-            return 3f;
         }
     }
 }

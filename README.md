@@ -1,22 +1,21 @@
 # Juice Galaxy
 
 A chaotic, physics-driven VR action game for **Meta Quest**, built natively in Unity (URP + OpenXR).
-You play a highly elastic, floppy little creature exploring a school and a galaxy of floating
-planetoids, smacking bizarre creatures around with momentum-based melee, and chugging **Juice** -
-the game's single resource for health, currency and unlocking new abilities.
+You play a highly elastic, floppy little creature exploring a school and its playground floating
+in a starry void, smacking bizarre creatures around with momentum-based melee, and chugging
+**Juice** - the game's single resource for health, currency and unlocking new abilities.
 
 You spawn in a fever-dream classroom watched over by **Mrs. Slithers**, a floppy, weird snake
 teacher who lurks by her blackboard. Out the door is a playground with crate stacks (they give
 Juice, but a toppling stack can crush you), a hue-cycling rainbow bouncy ball, and **Ingot**, who
-will teach you to fly if you hold the **A** button near him. Once you've learned to fly, the
-surrounding planetoids are yours to explore.
+will teach you to fly if you hold the **A** button near him.
 
 This whole project is generated **entirely from code** - there is one hand-authored Unity scene
 (`Assets/Scenes/Bootstrap.unity`) containing a single empty GameObject running `GameBootstrap.cs`.
-Everything else - the school, the playground, the planetoids, the player's XR rig, the floppy
-character rigs, Mrs. Slithers, Ingot, the enemies, and the HUD - is built at runtime in `Awake()`
-using primitive meshes, procedurally generated low-poly icospheres, and procedurally generated
-textures. There are no imported art assets to go stale or break.
+Everything else - the school, the playground, the player's XR rig, the floppy character rigs,
+Mrs. Slithers, Ingot, the enemies, and the HUD - is built at runtime in `Awake()` using primitive
+meshes, procedurally generated low-poly icospheres, and procedurally generated textures. There are
+no imported art assets to go stale or break.
 
 ## What's implemented
 
@@ -46,8 +45,8 @@ textures. There are no imported art assets to go stale or break.
   (`MrsSlithersNPC.cs`, `MrsSlithersAI.cs`).
 - **Ingot**: a friendly golden bar-shaped NPC with floppy limbs who teaches flight
   (`IngotNPC.cs`).
-- **Wobbly creatures**: small bizarre blob enemies wandering the playground and planetoids that
-  wander/chase/lunge and drop Juice on death (`WobblyCreature.cs`, `CreatureAI.cs`).
+- **Wobbly creatures**: small bizarre blob enemies wandering the playground that wander/chase/lunge
+  and drop Juice on death (`WobblyCreature.cs`, `CreatureAI.cs`).
 - **HUD**: segmented health/Juice bars pinned to the top-left of view, styled after the reference
   screenshot (`JuiceBarUI.cs`).
 
@@ -61,7 +60,7 @@ Assets/
     XR/                       Runtime-built XR head/hand tracking + input actions
     Player/                   Locomotion, momentum melee fists, flight, floppy visuals
     Combat/                   Health, MomentumMeleeHitbox, CrushHazard
-    World/                    School, playground, planetoids, crates, pickups, bouncy ball
+    World/                    School, playground, starfield/island base, crates, pickups, bouncy ball
     NPC/                      Mrs. Slithers, Ingot, wobbly creatures + their AI
     UI/                       World-space labels, HUD bars
     Utils/                    Procedural meshes/textures, primitive builders, FloppyChain
