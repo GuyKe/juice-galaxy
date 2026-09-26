@@ -5,8 +5,8 @@ namespace JuiceGalaxy
 {
     /// <summary>
     /// Builds the school spawn room from the reference screenshot: mottled tan walls, a teal/blue
-    /// checkered floor, three colorful cut-out windows, rows of desks, and a blackboard reading
-    /// "Mrs. S..." where Mrs. Slithers waits.
+    /// checkered floor, three colorful cut-out windows, rows of desks, and a blank blackboard where
+    /// Mrs. Slithers waits. Sits on a sealed, empty first floor the player can't get into.
     /// </summary>
     public static class SchoolBuilder
     {
@@ -40,6 +40,10 @@ namespace JuiceGalaxy
             PrimBuilder.Plane(root, "Floor", Vector3.zero, new Vector2(length, depth), floorMat);
             PrimBuilder.Cube(root, "Ceiling", new Vector3(0, height, 0), new Vector3(length, thickness, depth), ceilingMat);
 
+            // A sealed, empty first floor beneath the classroom - solid on every side, so it's
+            // just there to ground the building and can't actually be entered.
+            BuildFirstFloor(root, length, depth, wallMat);
+
             // Back wall (+Z) holds the blackboard - Mrs. Slithers' domain.
             var backWall = new GameObject("BackWall").transform;
             backWall.SetParent(root, false);
@@ -49,7 +53,6 @@ namespace JuiceGalaxy
 
             var blackboard = PrimBuilder.Cube(backWall, "Blackboard", new Vector3(1.5f, 2.1f, -thickness / 2f - 0.02f),
                 new Vector3(4.2f, 1.9f, 0.05f), boardMat, false).transform;
-            CreateChalkText(blackboard, "Mrs. S...", new Vector3(0, 0.15f, -0.05f));
 
             // Front wall (-Z) has the doorway the player spawns near.
             var frontWall = new GameObject("FrontWall").transform;
@@ -142,6 +145,12 @@ namespace JuiceGalaxy
             }
         }
 
+        static void BuildFirstFloor(Transform root, float length, float depth, Material wallMat)
+        {
+            const float floorHeight = 3f;
+            PrimBuilder.Cube(root, "FirstFloor", new Vector3(0, -floorHeight / 2f, 0), new Vector3(length, floorHeight, depth), wallMat);
+        }
+
         static void BuildDesks(Transform root)
         {
             var topMat = MaterialUtil.CreateLit(new Color(0.75f, 0.4f, 0.12f));
@@ -167,23 +176,6 @@ namespace JuiceGalaxy
                     PrimBuilder.Cube(desk, "Leg", new Vector3(sign.x * lx, 0.27f, sign.y * lz), new Vector3(0.06f, 0.54f, 0.06f), legMat);
                 }
             }
-        }
-
-        static void CreateChalkText(Transform parent, string text, Vector3 localPos)
-        {
-            var go = new GameObject("ChalkText");
-            go.transform.SetParent(parent, false);
-            go.transform.localPosition = localPos;
-            go.transform.localRotation = Quaternion.Euler(0, 180f, 0);
-            go.transform.localScale = Vector3.one * 0.3f;
-
-            var tm = go.AddComponent<TextMesh>();
-            tm.text = text;
-            tm.characterSize = 1f;
-            tm.fontSize = 48;
-            tm.color = new Color(0.92f, 0.92f, 0.85f);
-            tm.anchor = TextAnchor.MiddleCenter;
-            tm.alignment = TextAlignment.Center;
         }
 
         static void AddDirectionalLightIfMissing()

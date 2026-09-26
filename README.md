@@ -35,8 +35,8 @@ no imported art assets to go stale or break.
   ~1.5s to unlock it, then hold **A** anywhere to fly in your look direction (`PlayerFlight.cs`,
   `IngotFlightTutor.cs`).
 - **The school**: a low-poly classroom matching the reference art direction - mottled tan walls, a
-  teal/blue checkered floor, three colorful cut-out windows, rows of desks, and a blackboard reading
-  "Mrs. S..." (`SchoolBuilder.cs`).
+  teal/blue checkered floor, three colorful cut-out windows, rows of desks, and a blank blackboard,
+  sitting on a sealed, empty first floor the player can't get into (`SchoolBuilder.cs`).
 - **The playground**: crate stacks that reward Juice when punched apart but can crush you if they
   topple onto you (`CrateStack.cs`, `CrushHazard.cs`), and a rainbow bouncy ball
   (`RainbowBouncyBall.cs`).
