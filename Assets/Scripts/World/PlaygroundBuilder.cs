@@ -26,11 +26,12 @@ namespace JuiceGalaxy
 
             var groundMat = MaterialUtil.CreateLit(Color.white,
                 MaterialUtil.CreateCrackedGroundTexture(new Color(0.42f, 0.58f, 0.26f), new Color(0.16f, 0.22f, 0.1f), 64, 24));
-            // A long stretch of turf running away from the school. Its near edge stops short of the
-            // school wall (the Path plane below bridges the gap) so it doesn't overlap - and
-            // z-fight with - the school's own floor.
+            // A long stretch of turf running away from the school. Its near edge reaches exactly to
+            // the school's exterior wall face - flush, not overlapping, so there's no gap when you
+            // walk out the door, but also no z-fighting with the school's own interior floor (which
+            // only extends on the other side of that same wall).
             const float groundLength = 140f;
-            const float groundNearEdge = 6f;
+            const float groundNearEdge = 8f;
             PrimBuilder.Plane(root, "PlaygroundGround", new Vector3(0, 0, groundNearEdge - groundLength / 2f),
                 new Vector2(60, groundLength), groundMat);
 
@@ -38,11 +39,18 @@ namespace JuiceGalaxy
             var pathMat = MaterialUtil.CreateLit(new Color(0.55f, 0.5f, 0.45f));
             PrimBuilder.Plane(root, "Path", new Vector3(0, 0.01f, 8), new Vector2(2.5f, 8f), pathMat);
 
+            // Crates near the school door...
             CrateStack.Build(root, center + Spread(-6f, -3f), 4);
             CrateStack.Build(root, center + Spread(-6f, -1f), 3);
             CrateStack.Build(root, center + Spread(6f, -4f), 5);
+            // ...more scattered through the middle of the field...
+            CrateStack.Build(root, center + new Vector3(-9f, 0f, -60f), 4);
+            CrateStack.Build(root, center + new Vector3(8f, 0f, -68f), 3);
+            // ...and more still further back, near the far end.
+            CrateStack.Build(root, center + new Vector3(9f, 0f, -102f), 5);
+            CrateStack.Build(root, center + new Vector3(-8f, 0f, -110f), 4);
 
-            RainbowBouncyBall.Spawn(root, center + Spread(2f, 1f, 1.5f));
+            RainbowBouncyBall.Spawn(root, center + new Vector3(0f, 1.5f, -62f));
             SpikeHazard.Spawn(root, center + Spread(6.5f, -1.5f, 0.5f));
 
             // The lips wall waits all the way out at the far end of the long field.
@@ -64,7 +72,7 @@ namespace JuiceGalaxy
         static void BuildStoneLipsWall(Transform root, Vector3 localOffset)
         {
             var mat = MaterialUtil.CreateLit(Color.white, MaterialUtil.CreateStoneLipsTexture());
-            PrimBuilder.Cube(root, "StoneLipsWall", localOffset + new Vector3(0, 1.1f, 0), new Vector3(2.2f, 2.2f, 0.35f), mat);
+            PrimBuilder.Cube(root, "StoneLipsWall", localOffset + new Vector3(0, 1.9f, 0), new Vector3(4f, 3.8f, 0.5f), mat);
         }
 
         static void BuildObelisk(Transform root, Vector3 localOffset, float height)
