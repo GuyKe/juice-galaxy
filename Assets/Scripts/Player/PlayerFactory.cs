@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace JuiceGalaxy
@@ -36,6 +37,7 @@ namespace JuiceGalaxy
             flight.windChains = BuildFloppyVisuals(playerGo.transform, xrRig);
             BuildFists(xrRig, playerGo);
             BuildHandGrabbers(xrRig, playerGo);
+            DisableSelfCollisions(controller, flight.windChains);
 
             var gm = GameManager.Instance;
             if (gm != null) gm.RegisterPlayer(playerGo.transform, juice, health, xrRig.headCamera);
@@ -106,6 +108,35 @@ namespace JuiceGalaxy
 
             var right = owner.AddComponent<HandGrabber>();
             right.Init(rig.rightHand, rig.rightTriggerAction, owner);
+        }
+
+        /// <summary>
+        /// The floppy sleeve/tail segments have solid colliders so they can bump world geometry,
+        /// but without this they'd also collide with the player's own CharacterController and each
+        /// other every frame - the constant self-pushback is what made the arms look "glitched",
+        /// getting shoved into tangled poses under the torso.
+        /// </summary>
+        static void DisableSelfCollisions(CharacterController controller, FloppyChain[] chains)
+        {
+            if (chains == null) return;
+
+            var colliders = new List<Collider>();
+            foreach (var chain in chains)
+            {
+                if (chain == null || chain.segments == null) continue;
+                foreach (var segment in chain.segments)
+                {
+                    var col = segment != null ? segment.GetComponent<Collider>() : null;
+                    if (col != null) colliders.Add(col);
+                }
+            }
+
+            foreach (var col in colliders)
+                Physics.IgnoreCollision(controller, col);
+
+            for (int i = 0; i < colliders.Count; i++)
+                for (int j = i + 1; j < colliders.Count; j++)
+                    Physics.IgnoreCollision(colliders[i], colliders[j]);
         }
     }
 }

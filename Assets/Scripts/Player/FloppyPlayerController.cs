@@ -12,7 +12,7 @@ namespace JuiceGalaxy
     public class FloppyPlayerController : MonoBehaviour
     {
         public XRInputRig rig;
-        public float moveSpeed = 2.2f;
+        public float moveSpeed = 3.8f;
         public float gravity = -9.81f;
         public float snapTurnDegrees = 45f;
         public float snapTurnCooldown = 0.35f;

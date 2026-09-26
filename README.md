@@ -40,7 +40,10 @@ imported art assets to go stale or break.
   mine drains it.
 - **Flight**: locked until Ingot teaches you. Hold the right controller's **A** button near him for
   ~1.5s to unlock it, then hold **A** anywhere to fly in your look direction (`PlayerFlight.cs`,
-  `IngotFlightTutor.cs`).
+  `IngotFlightTutor.cs`). The moment he delivers his line, the camera cuts to a brief close-up on
+  his face for the ~3 seconds he's "talking," then cuts back to your normal first-person view -
+  scoped to that one bounded beat rather than the whole open-ended waiting prompt, since freezing
+  real head tracking for an indefinite stretch is a real VR discomfort risk.
 - **The school**: a low-poly schoolhouse - deep red mottled walls, a flat dark roof that overhangs
   the walls on every side (with a grabbable morningstar resting on top), five plain dark cut-out
   windows, and a real walk-through doorway (not just a decal) leading to a teal/blue checkered
@@ -121,3 +124,8 @@ normally does interactively haven't been done yet:
   keeping with the chunky, fever-dream aesthetic of the reference screenshot.
 - There's no full-body/leg IK, save/load, or menu system yet - this is a playable core loop, not a
   finished, content-complete game.
+- Ingot's dialogue camera cut (`IngotFlightTutor.cs`) briefly disables and overrides the HMD's
+  TrackedPoseDriver to frame a close-up, then hands tracking back. This follows the Input System's
+  documented APIs and is designed to be short and comfort-conscious, but VR camera overrides are
+  inherently hard to fully validate without a headset - worth a specific look on-device, and easy
+  to disable (skip calling `UpdateCameraFocus`) if it feels off.

@@ -79,6 +79,7 @@ namespace JuiceGalaxy
 
             var tutor = root.gameObject.AddComponent<IngotFlightTutor>();
             tutor.promptLabel = promptLabel;
+            tutor.facePoint = head;
 
             return root;
         }
