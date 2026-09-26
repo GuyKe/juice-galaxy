@@ -126,6 +126,124 @@ namespace JuiceGalaxy
             return tex;
         }
 
+        /// <summary>Patchy green ground broken up by dark cracks (Voronoi cells) - the playground's turf.</summary>
+        public static Texture2D CreateCrackedGroundTexture(Color baseColor, Color crackColor, int size = 64, int cellCount = 24, int seed = 0)
+        {
+            var rng = new System.Random(seed);
+            var points = new Vector2[cellCount];
+            var shades = new float[cellCount];
+            for (int i = 0; i < cellCount; i++)
+            {
+                points[i] = new Vector2((float)rng.NextDouble() * size, (float)rng.NextDouble() * size);
+                shades[i] = Mathf.Lerp(0.82f, 1.15f, (float)rng.NextDouble());
+            }
+
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            tex.filterMode = FilterMode.Bilinear;
+            tex.wrapMode = TextureWrapMode.Repeat;
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float best = float.MaxValue, second = float.MaxValue;
+                    int bestIdx = 0;
+                    for (int i = 0; i < cellCount; i++)
+                    {
+                        float dx = Mathf.Min(Mathf.Abs(x - points[i].x), size - Mathf.Abs(x - points[i].x));
+                        float dy = Mathf.Min(Mathf.Abs(y - points[i].y), size - Mathf.Abs(y - points[i].y));
+                        float d = dx * dx + dy * dy;
+                        if (d < best) { second = best; best = d; bestIdx = i; }
+                        else if (d < second) second = d;
+                    }
+
+                    float edge = Mathf.Sqrt(second) - Mathf.Sqrt(best);
+                    Color c = baseColor * shades[bestIdx];
+                    c.a = 1f;
+                    if (edge < size * 0.035f) c = crackColor;
+
+                    tex.SetPixel(x, y, c);
+                }
+            }
+            tex.Apply();
+            return tex;
+        }
+
+        /// <summary>Wooden crate planks with a diagonal support beam and dark corner brackets.</summary>
+        public static Texture2D CreateCrateTexture(int size = 64)
+        {
+            Color plank = new Color(0.58f, 0.37f, 0.16f);
+            Color plankDark = new Color(0.47f, 0.28f, 0.11f);
+            Color metal = new Color(0.12f, 0.08f, 0.06f);
+
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            tex.filterMode = FilterMode.Point;
+            tex.wrapMode = TextureWrapMode.Clamp;
+
+            int plankWidth = Mathf.Max(1, size / 5);
+            float cornerSize = size * 0.22f;
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    Color c = ((x / plankWidth) % 2 == 0) ? plank : plankDark;
+
+                    float nx = x / (float)size, ny = y / (float)size;
+                    if (Mathf.Abs(nx - ny) < 0.06f) c = metal;
+
+                    bool nearCorner =
+                        (x < cornerSize && y < cornerSize) || (x < cornerSize && y > size - cornerSize) ||
+                        (x > size - cornerSize && y < cornerSize) || (x > size - cornerSize && y > size - cornerSize);
+                    if (nearCorner)
+                    {
+                        float distToEdge = Mathf.Min(Mathf.Min(x, size - 1 - x), Mathf.Min(y, size - 1 - y));
+                        if (distToEdge < cornerSize * 0.35f) c = metal;
+                    }
+
+                    tex.SetPixel(x, y, c);
+                }
+            }
+            tex.Apply();
+            return tex;
+        }
+
+        /// <summary>A rough stone panel with a big pair of red lips painted on it - creepy set dressing.</summary>
+        public static Texture2D CreateStoneLipsTexture(int size = 96)
+        {
+            var tex = CreateMottleTexture(new Color(0.42f, 0.4f, 0.4f), new Color(0.26f, 0.24f, 0.25f), size, 11);
+
+            Color lipDark = new Color(0.5f, 0.05f, 0.1f);
+            Color lipMid = new Color(0.75f, 0.12f, 0.18f);
+            Color seam = new Color(0.15f, 0.02f, 0.03f);
+            Color tooth = new Color(0.92f, 0.9f, 0.85f);
+
+            float cx = size * 0.5f, cy = size * 0.46f;
+            float rx = size * 0.34f, ry = size * 0.16f;
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float nx = (x - cx) / rx;
+                    float ny = (y - cy) / ry;
+                    float d = nx * nx + ny * ny;
+                    if (d <= 1f)
+                    {
+                        float edge = 1f - d;
+                        Color c = Color.Lerp(lipDark, lipMid, Mathf.Clamp01(edge * 1.5f));
+
+                        if (Mathf.Abs(y - cy) < size * 0.012f) c = seam;
+                        if (y > cy && y < cy + size * 0.05f && d < 0.55f) c = tooth;
+
+                        tex.SetPixel(x, y, c);
+                    }
+                }
+            }
+            tex.Apply();
+            return tex;
+        }
+
         /// <summary>A trippy rainbow spiral on a dark background - used for Mrs. Slithers' swirling eyes.</summary>
         public static Texture2D CreateSwirlTexture(int size = 64, int arms = 5)
         {

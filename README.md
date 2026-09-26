@@ -1,14 +1,15 @@
 # Juice Galaxy
 
 A chaotic, physics-driven VR action game for **Meta Quest**, built natively in Unity (URP + OpenXR).
-You play a highly elastic, floppy little creature exploring a school and its playground floating
-in a starry void, smacking bizarre creatures around with momentum-based melee, and chugging
-**Juice** - the game's single resource for health, currency and unlocking new abilities.
+You play a highly elastic, floppy little creature exploring a school and its playground under a
+psychedelic rainbow sky, using momentum-based melee combat, and chugging **Juice** - the game's
+single resource for health, currency and unlocking new abilities.
 
 You spawn in a fever-dream classroom watched over by **Mrs. Slithers**, a floppy, weird snake
-teacher who lurks by her blackboard. Out the door is a playground with crate stacks (they give
-Juice, but a toppling stack can crush you), a hue-cycling rainbow bouncy ball, and **Ingot**, who
-will teach you to fly if you hold the **A** button near him.
+teacher who lurks by her blackboard. Out the door is a playground with cracked green turf, crate
+stacks (they give Juice, but a toppling stack can crush you), a spiked mine, a stone wall with
+painted-on lips, a hue-cycling rainbow bouncy ball, and **Ingot**, who will teach you to fly if you
+hold the **A** button near him.
 
 This whole project is generated **entirely from code** - there is one hand-authored Unity scene
 (`Assets/Scenes/Bootstrap.unity`) containing a single empty GameObject running `GameBootstrap.cs`.
@@ -25,28 +26,27 @@ no imported art assets to go stale or break.
   movement/collision) with a purely cosmetic elastic body - jiggly tentacle-sleeve arms trailing
   from your tracked hands and a floppy tail, all built from spring-jointed physics chains
   (`FloppyChain.cs`).
-- **Momentum-based melee combat**: your fists (and Mrs. Slithers' head, and every creature) track
-  their own real-world velocity every physics step; damage scales with how fast you actually swing
+- **Momentum-based melee combat**: your fists (and Mrs. Slithers' head) track their own real-world
+  velocity every physics step; damage scales with how fast you actually swing
   (`MomentumMeleeHitbox.cs`).
 - **Juice**: one resource that is simultaneously your health pool and your progression currency
-  (`JuiceSystem.cs`). Crates and defeated creatures drop Juice pickups; combat and getting crushed
-  drain it.
+  (`JuiceSystem.cs`). Crates drop Juice pickups; combat, getting crushed, or touching the spiked
+  mine drains it.
 - **Flight**: locked until Ingot teaches you. Hold the right controller's **A** button near him for
   ~1.5s to unlock it, then hold **A** anywhere to fly in your look direction (`PlayerFlight.cs`,
   `IngotFlightTutor.cs`).
 - **The school**: a low-poly classroom matching the reference art direction - mottled tan walls, a
   teal/blue checkered floor, three colorful cut-out windows, rows of desks, and a blank blackboard,
   sitting on a sealed, empty first floor the player can't get into (`SchoolBuilder.cs`).
-- **The playground**: crate stacks that reward Juice when punched apart but can crush you if they
-  topple onto you (`CrateStack.cs`, `CrushHazard.cs`), and a rainbow bouncy ball
-  (`RainbowBouncyBall.cs`).
+- **The playground**: cracked green turf, crate stacks that reward Juice when punched apart but can
+  crush you if they topple onto you (`CrateStack.cs`, `CrushHazard.cs`), a floating spiked mine
+  that damages on contact (`SpikeHazard.cs`), a stone wall with painted-on lips
+  (`PlaygroundBuilder.cs`), and a rainbow bouncy ball (`RainbowBouncyBall.cs`).
 - **Mrs. Slithers**: a big floppy, weird snake NPC/mini-boss with a spring-jointed noodle body,
-  cartoon eyes, fangs and a tongue, who idles, notices, and lunges at the player
+  swirling psychedelic eyes and fangs, who idles, notices, and lunges at the player
   (`MrsSlithersNPC.cs`, `MrsSlithersAI.cs`).
 - **Ingot**: a friendly golden bar-shaped NPC with floppy limbs who teaches flight
   (`IngotNPC.cs`).
-- **Wobbly creatures**: small bizarre blob enemies wandering the playground that wander/chase/lunge
-  and drop Juice on death (`WobblyCreature.cs`, `CreatureAI.cs`).
 - **HUD**: segmented health/Juice bars pinned to the top-left of view, styled after the reference
   screenshot (`JuiceBarUI.cs`).
 
@@ -60,8 +60,8 @@ Assets/
     XR/                       Runtime-built XR head/hand tracking + input actions
     Player/                   Locomotion, momentum melee fists, flight, floppy visuals
     Combat/                   Health, MomentumMeleeHitbox, CrushHazard
-    World/                    School, playground, starfield/island base, crates, pickups, bouncy ball
-    NPC/                      Mrs. Slithers, Ingot, wobbly creatures + their AI
+    World/                    School, playground, rainbow sky/island base, crates, pickups, bouncy ball
+    NPC/                      Mrs. Slithers, Ingot, and their AI
     UI/                       World-space labels, HUD bars
     Utils/                    Procedural meshes/textures, primitive builders, FloppyChain
 ```

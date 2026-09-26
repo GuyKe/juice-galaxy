@@ -2,53 +2,95 @@ using UnityEngine;
 
 namespace JuiceGalaxy
 {
-    /// <summary>Builds the space backdrop: a starfield and the chunky rock base under the school/playground island.</summary>
+    /// <summary>Builds the backdrop: a psychedelic rainbow sky dome and the chunky rock base under the school/playground island.</summary>
     public static class PlanetoidFieldBuilder
     {
         public static void Build(Transform parent, Vector3 islandCenter, Vector2 islandFootprint)
         {
-            SetupSpaceAtmosphere();
-            SpawnStarfield(parent);
+            SetupSkyAtmosphere();
+            SpawnRainbowSky(parent, islandCenter);
             BuildIslandBase(parent, islandCenter, islandFootprint);
         }
 
-        static void SetupSpaceAtmosphere()
+        static void SetupSkyAtmosphere()
         {
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.22f, 0.18f, 0.3f);
-            RenderSettings.fog = true;
-            RenderSettings.fogColor = new Color(0.06f, 0.03f, 0.12f);
-            RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogStartDistance = 40f;
-            RenderSettings.fogEndDistance = 140f;
+            RenderSettings.ambientLight = new Color(0.55f, 0.5f, 0.6f);
+            RenderSettings.fog = false;
         }
 
-        static void SpawnStarfield(Transform parent)
+        /// <summary>
+        /// A huge inverted sphere painted with a vertical rainbow gradient - the player always
+        /// stands inside it. Winding is flipped so the (otherwise back-face-culled) inner surface
+        /// renders, and it uses the same URP Unlit shader as everything else in the world so it
+        /// isn't at risk of being stripped from the on-device build.
+        /// </summary>
+        static void SpawnRainbowSky(Transform parent, Vector3 center)
         {
-            var go = new GameObject("Starfield");
+            const float radius = 400f;
+            var mesh = ProceduralMesh.CreateFlatShadedIcosphere(radius, 3);
+
+            var verts = mesh.vertices;
+            var uvs = new Vector2[verts.Length];
+            for (int i = 0; i < verts.Length; i++)
+            {
+                float t = Mathf.InverseLerp(-radius, radius, verts[i].y);
+                uvs[i] = new Vector2(0f, t);
+            }
+            mesh.uv = uvs;
+
+            var tris = mesh.triangles;
+            for (int i = 0; i < tris.Length; i += 3)
+            {
+                (tris[i + 1], tris[i + 2]) = (tris[i + 2], tris[i + 1]);
+            }
+            mesh.triangles = tris;
+
+            var go = new GameObject("RainbowSky");
             go.transform.SetParent(parent, false);
-            var ps = go.AddComponent<ParticleSystem>();
-            var main = ps.main;
-            main.loop = false;
-            main.playOnAwake = true;
-            main.startLifetime = Mathf.Infinity;
-            main.startSpeed = 0f;
-            main.startSize = new ParticleSystem.MinMaxCurve(0.3f, 1.2f);
-            main.maxParticles = 2000;
-            main.simulationSpace = ParticleSystemSimulationSpace.World;
-            main.startColor = new ParticleSystem.MinMaxGradient(new Color(1f, 1f, 1f, 0.9f), new Color(0.7f, 0.8f, 1f, 0.9f));
+            go.transform.position = center;
+            var mf = go.AddComponent<MeshFilter>();
+            mf.sharedMesh = mesh;
+            var mr = go.AddComponent<MeshRenderer>();
+            mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            mr.receiveShadows = false;
+            mr.sharedMaterial = MaterialUtil.CreateUnlit(Color.white, BuildRainbowGradientTexture());
+        }
 
-            var shape = ps.shape;
-            shape.shapeType = ParticleSystemShapeType.Sphere;
-            shape.radius = 300f;
+        static Texture2D BuildRainbowGradientTexture()
+        {
+            var stops = new (float t, Color c)[]
+            {
+                (0.0f,  new Color(0.85f, 0.25f, 0.1f)),
+                (0.25f, new Color(0.9f, 0.5f, 0.55f)),
+                (0.45f, new Color(0.75f, 0.65f, 0.85f)),
+                (0.65f, new Color(0.55f, 0.7f, 0.85f)),
+                (0.85f, new Color(0.55f, 0.8f, 0.55f)),
+                (1.0f,  new Color(0.8f, 0.85f, 0.45f)),
+            };
 
-            var emission = ps.emission;
-            emission.rateOverTime = 0f;
-            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 2000) });
+            const int size = 128;
+            var tex = new Texture2D(4, size, TextureFormat.RGBA32, false);
+            tex.wrapMode = TextureWrapMode.Clamp;
+            tex.filterMode = FilterMode.Bilinear;
 
-            var renderer = go.GetComponent<ParticleSystemRenderer>();
-            renderer.material = MaterialUtil.CreateUnlit(Color.white);
-            renderer.renderMode = ParticleSystemRenderMode.Billboard;
+            for (int y = 0; y < size; y++)
+            {
+                float t = y / (float)(size - 1);
+                Color c = stops[stops.Length - 1].c;
+                for (int i = 0; i < stops.Length - 1; i++)
+                {
+                    if (t >= stops[i].t && t <= stops[i + 1].t)
+                    {
+                        float localT = Mathf.InverseLerp(stops[i].t, stops[i + 1].t, t);
+                        c = Color.Lerp(stops[i].c, stops[i + 1].c, localT);
+                        break;
+                    }
+                }
+                for (int x = 0; x < 4; x++) tex.SetPixel(x, y, c);
+            }
+            tex.Apply();
+            return tex;
         }
 
         static void BuildIslandBase(Transform parent, Vector3 center, Vector2 footprint)

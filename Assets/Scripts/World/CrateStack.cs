@@ -10,8 +10,7 @@ namespace JuiceGalaxy
     {
         public static void Build(Transform parent, Vector3 basePosition, int count, float crateSize = 0.6f)
         {
-            var mat = MaterialUtil.CreateLit(new Color(0.55f, 0.35f, 0.15f),
-                MaterialUtil.CreateMottleTexture(new Color(0.55f, 0.35f, 0.15f), new Color(0.4f, 0.24f, 0.08f), 24, Random.Range(0, 1000)));
+            var mat = MaterialUtil.CreateLit(Color.white, MaterialUtil.CreateCrateTexture());
 
             for (int i = 0; i < count; i++)
             {

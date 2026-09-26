@@ -24,7 +24,7 @@ namespace JuiceGalaxy
 
             const float length = 10f;  // along X (window wall)
             const float depth = 8f;    // along Z
-            const float height = 4f;
+            const float height = 7f;
             const float thickness = 0.3f;
 
             var wallMat = MaterialUtil.CreateLit(new Color(0.62f, 0.5f, 0.32f),
