@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace JuiceGalaxy
 {
@@ -14,6 +15,7 @@ namespace JuiceGalaxy
         public Rigidbody anchor;
         public Rigidbody[] segments;
         public Transform[] visuals;
+        public SpringJoint[] joints;
 
         // A fast hand swing (momentum melee relies on exactly this) can move the driver several
         // tens of centimeters in a single physics step. Teleporting the anchor straight there made
@@ -22,6 +24,15 @@ namespace JuiceGalaxy
         // step - and clamping segment speed as a second safety net - keeps that bounded.
         public float maxAnchorSpeed = 14f;
         public float maxSegmentSpeed = 12f;
+
+        // Optional: an <XRController>/isTracked action for this chain's driver hand. Quest's
+        // inside-out controller tracking can briefly lose a hand that swings out of the headset's
+        // camera view, at which point the driver transform just holds its last known pose. Without
+        // this the limb reads as rigidly "frozen" onto that stale point; with it, the joints go
+        // slack so the limb sags under gravity instead until tracking resumes.
+        public InputAction trackedAction;
+        float _baseSpring, _baseDamper;
+        bool _relaxed;
 
         public static FloppyChain Build(Transform parent, string name, Transform driver, int segmentCount,
             float segmentLength, float startRadius, float endRadius, Material material,
@@ -41,6 +52,9 @@ namespace JuiceGalaxy
 
             chain.segments = new Rigidbody[segmentCount];
             chain.visuals = new Transform[segmentCount];
+            chain.joints = new SpringJoint[segmentCount];
+            chain._baseSpring = spring;
+            chain._baseDamper = damper;
 
             Rigidbody previous = anchorRb;
             Vector3 spawnPos = driver.position;
@@ -85,6 +99,7 @@ namespace JuiceGalaxy
                 joint.minDistance = 0f;
                 joint.maxDistance = segmentLength * 0.85f;
                 joint.tolerance = 0.02f;
+                chain.joints[i] = joint;
 
                 previous = rb;
             }
@@ -124,11 +139,29 @@ namespace JuiceGalaxy
         {
             if (driver == null || anchor == null) return;
 
-            Vector3 delta = driver.position - anchor.position;
-            float maxStep = maxAnchorSpeed * Time.fixedDeltaTime;
-            if (delta.magnitude > maxStep) delta = delta.normalized * maxStep;
-            anchor.MovePosition(anchor.position + delta);
-            anchor.MoveRotation(driver.rotation);
+            bool tracked = trackedAction == null || trackedAction.ReadValue<float>() > 0.5f;
+            if (tracked == _relaxed && joints != null)
+            {
+                // First frame tracking flips state: slack the joints so the limb sags under gravity
+                // instead of holding a rigid pose on a stale tracked position, then restore them the
+                // moment tracking comes back.
+                _relaxed = !tracked;
+                foreach (var joint in joints)
+                {
+                    if (joint == null) continue;
+                    joint.spring = tracked ? _baseSpring : 0f;
+                    joint.damper = tracked ? _baseDamper : 2f;
+                }
+            }
+
+            if (tracked)
+            {
+                Vector3 delta = driver.position - anchor.position;
+                float maxStep = maxAnchorSpeed * Time.fixedDeltaTime;
+                if (delta.magnitude > maxStep) delta = delta.normalized * maxStep;
+                anchor.MovePosition(anchor.position + delta);
+                anchor.MoveRotation(driver.rotation);
+            }
 
             if (segments == null) return;
             float maxSqr = maxSegmentSpeed * maxSegmentSpeed;

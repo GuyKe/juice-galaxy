@@ -70,7 +70,9 @@ namespace JuiceGalaxy
             // Floppy smooth, rounded arms dangling from each hand, matching the reference character's
             // tapering limbs.
             var leftSleeve = FloppyChain.Build(playerRoot, "LeftSleeve", rig.leftHand, 4, 0.09f, 0.06f, 0.02f, bodyMat);
+            leftSleeve.trackedAction = rig.leftHandTrackedAction;
             var rightSleeve = FloppyChain.Build(playerRoot, "RightSleeve", rig.rightHand, 4, 0.09f, 0.06f, 0.02f, bodyMat);
+            rightSleeve.trackedAction = rig.rightHandTrackedAction;
 
             // Floppy tail dangling from the torso.
             var tail = FloppyChain.Build(playerRoot, "Tail", torsoHolder.transform, 5, 0.1f, 0.07f, 0.015f, bodyMat);

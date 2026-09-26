@@ -21,6 +21,8 @@ namespace JuiceGalaxy
         public InputAction flyButtonAction { get; private set; }
         public InputAction leftTriggerAction { get; private set; }
         public InputAction rightTriggerAction { get; private set; }
+        public InputAction leftHandTrackedAction { get; private set; }
+        public InputAction rightHandTrackedAction { get; private set; }
 
         public static XRInputRig Build(Transform parent)
         {
@@ -42,6 +44,15 @@ namespace JuiceGalaxy
 
             leftHand = CreateTracked("LeftHand", "<XRController>{LeftHand}/devicePosition", "<XRController>{LeftHand}/deviceRotation", "Vector3", "Quaternion");
             rightHand = CreateTracked("RightHand", "<XRController>{RightHand}/devicePosition", "<XRController>{RightHand}/deviceRotation", "Vector3", "Quaternion");
+
+            // Quest's inside-out controller tracking can briefly lose a hand that swings out of the
+            // headset's camera view (behind the back, down low, fast motion). When that happens the
+            // devicePosition binding above just holds its last known value, which otherwise reads as
+            // the floppy arm being rigidly "frozen". Exposing isTracked lets the arm go limp instead.
+            leftHandTrackedAction = new InputAction("LeftHandTracked", InputActionType.Button, "<XRController>{LeftHand}/isTracked");
+            rightHandTrackedAction = new InputAction("RightHandTracked", InputActionType.Button, "<XRController>{RightHand}/isTracked");
+            leftHandTrackedAction.Enable();
+            rightHandTrackedAction.Enable();
 
             moveAction = new InputAction("Move", InputActionType.Value, "<XRController>{LeftHand}/primary2DAxis", expectedControlType: "Vector2");
             turnAction = new InputAction("Turn", InputActionType.Value, "<XRController>{RightHand}/primary2DAxis", expectedControlType: "Vector2");
@@ -83,6 +94,8 @@ namespace JuiceGalaxy
             flyButtonAction?.Disable();
             leftTriggerAction?.Disable();
             rightTriggerAction?.Disable();
+            leftHandTrackedAction?.Disable();
+            rightHandTrackedAction?.Disable();
         }
     }
 }
