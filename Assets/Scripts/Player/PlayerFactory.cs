@@ -66,9 +66,9 @@ namespace JuiceGalaxy
             Object.Destroy(torso.GetComponent<Collider>());
             torso.GetComponent<MeshRenderer>().sharedMaterial = bodyMat;
 
-            // Floppy tentacle sleeves dangling from each hand.
-            var leftSleeve = FloppyChain.Build(playerRoot, "LeftSleeve", rig.leftHand, 4, 0.09f, 0.06f, 0.02f, bodyMat);
-            var rightSleeve = FloppyChain.Build(playerRoot, "RightSleeve", rig.rightHand, 4, 0.09f, 0.06f, 0.02f, bodyMat);
+            // Floppy blocky-cube arms dangling from each hand.
+            var leftSleeve = FloppyChain.Build(playerRoot, "LeftSleeve", rig.leftHand, 4, 0.09f, 0.06f, 0.02f, bodyMat, blocky: true);
+            var rightSleeve = FloppyChain.Build(playerRoot, "RightSleeve", rig.rightHand, 4, 0.09f, 0.06f, 0.02f, bodyMat, blocky: true);
 
             // Floppy tail dangling from the torso.
             var tail = FloppyChain.Build(playerRoot, "Tail", torsoHolder.transform, 5, 0.1f, 0.07f, 0.015f, bodyMat);

@@ -25,7 +25,7 @@ namespace JuiceGalaxy
 
         public static FloppyChain Build(Transform parent, string name, Transform driver, int segmentCount,
             float segmentLength, float startRadius, float endRadius, Material material,
-            float spring = 900f, float damper = 12f, float segmentMass = 0.4f)
+            float spring = 900f, float damper = 12f, float segmentMass = 0.4f, bool blocky = false)
         {
             var root = new GameObject(name);
             root.transform.SetParent(parent, false);
@@ -56,14 +56,10 @@ namespace JuiceGalaxy
                 segGo.transform.SetParent(root.transform, false);
                 segGo.transform.position = spawnPos;
 
-                var visual = new GameObject("Visual");
-                visual.transform.SetParent(segGo.transform, false);
-                var mf = visual.AddComponent<MeshFilter>();
-                mf.sharedMesh = ProceduralMesh.CreateFlatShadedIcosphere(radius, 1);
-                var mr = visual.AddComponent<MeshRenderer>();
-                mr.sharedMaterial = material;
-                mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-                chain.visuals[i] = visual.transform;
+                Transform visual = blocky
+                    ? BuildBlockyVisual(segGo.transform, radius, material)
+                    : BuildRoundVisual(segGo.transform, radius, material);
+                chain.visuals[i] = visual;
 
                 var collider = segGo.AddComponent<SphereCollider>();
                 collider.radius = radius;
@@ -94,6 +90,34 @@ namespace JuiceGalaxy
             }
 
             return chain;
+        }
+
+        static Transform BuildRoundVisual(Transform segment, float radius, Material material)
+        {
+            var visual = new GameObject("Visual");
+            visual.transform.SetParent(segment, false);
+            var mf = visual.AddComponent<MeshFilter>();
+            mf.sharedMesh = ProceduralMesh.CreateFlatShadedIcosphere(radius, 1);
+            var mr = visual.AddComponent<MeshRenderer>();
+            mr.sharedMaterial = material;
+            mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            return visual.transform;
+        }
+
+        static Transform BuildBlockyVisual(Transform segment, float radius, Material material)
+        {
+            var visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            visual.name = "Visual";
+            visual.transform.SetParent(segment, false);
+            visual.transform.localScale = Vector3.one * radius * 1.8f;
+            // A little random tumble per segment so a chain of cubes reads as chunky and jointed
+            // rather than one obviously repeated block.
+            visual.transform.localRotation = Random.rotation;
+            Object.Destroy(visual.GetComponent<Collider>());
+            var mr = visual.GetComponent<MeshRenderer>();
+            mr.sharedMaterial = material;
+            mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            return visual.transform;
         }
 
         void FixedUpdate()

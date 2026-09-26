@@ -3,9 +3,9 @@ using UnityEngine;
 namespace JuiceGalaxy
 {
     /// <summary>
-    /// "Ingot tasks you with learning how to fly by holding A." Once JuiceSystem.flightUnlocked
-    /// is set, holding the right controller's A button lifts and propels the player forward
-    /// in their look direction; releasing lets gravity resume smoothly. While airborne, the
+    /// "Ingot tasks you with learning how to fly by holding the right thumbstick." Once
+    /// JuiceSystem.flightUnlocked is set, holding the right thumbstick down lifts and propels the
+    /// player forward in their look direction; releasing lets gravity resume smoothly. While airborne, the
     /// player's floppy limbs get blown backward by "wind" so the whole body ragdolls/flails.
     /// Flight doesn't cost Juice - Juice doubles as your health pool, so making flight also
     /// consume it meant getting hit (which drains Juice) could silently ground you, making flight

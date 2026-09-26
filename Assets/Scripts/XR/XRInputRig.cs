@@ -45,7 +45,7 @@ namespace JuiceGalaxy
 
             moveAction = new InputAction("Move", InputActionType.Value, "<XRController>{LeftHand}/primary2DAxis", expectedControlType: "Vector2");
             turnAction = new InputAction("Turn", InputActionType.Value, "<XRController>{RightHand}/primary2DAxis", expectedControlType: "Vector2");
-            flyButtonAction = new InputAction("Fly", InputActionType.Button, "<XRController>{RightHand}/primaryButton");
+            flyButtonAction = new InputAction("Fly", InputActionType.Button, "<XRController>{RightHand}/primary2DAxisClick");
             leftTriggerAction = new InputAction("LeftTrigger", InputActionType.Value, "<XRController>{LeftHand}/trigger", expectedControlType: "Axis");
             rightTriggerAction = new InputAction("RightTrigger", InputActionType.Value, "<XRController>{RightHand}/trigger", expectedControlType: "Axis");
 

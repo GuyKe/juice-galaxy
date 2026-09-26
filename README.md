@@ -23,9 +23,9 @@ imported art assets to go stale or break.
 - **Native Quest VR**: OpenXR + Unity XR Plugin Management, head/hand tracking built from the
   Input System's XR device layouts (no prefabs required).
 - **Floppy, physics-driven protagonist**: a `CharacterController`-based locomotion rig (reliable
-  movement/collision) with a purely cosmetic elastic body - jiggly tentacle-sleeve arms trailing
-  from your tracked hands and a floppy tail, all built from spring-jointed physics chains
-  (`FloppyChain.cs`).
+  movement/collision) with a purely cosmetic elastic body - blocky, tumbling cube-segment arms
+  trailing from your tracked hands and a floppy round-segment tail, all built from spring-jointed
+  physics chains with an optional blocky visual style (`FloppyChain.cs`).
 - **Momentum-based melee combat**: your fists track their own real-world velocity every physics
   step; damage scales with how fast you actually swing (`MomentumMeleeHitbox.cs`).
 - **Grabbing**: hold a controller trigger near a `Grabbable` object (e.g. the roof's morningstar)
@@ -40,9 +40,9 @@ imported art assets to go stale or break.
   you're in range - like a Minecraft XP orb (`JuicePickup.cs`); combat, getting crushed, or
   touching the spiked mine drains it.
 - **Flight**: locked until Ingot teaches you. The first time you approach him he says "There's a
-  cool toy on top of the school, hold A to fly." for 6 seconds. Afterward, hold the right
-  controller's **A** button near him for ~1.5s (any time, no on-screen countdown) to unlock flight,
-  then hold **A** anywhere to fly in your look direction, with no ongoing Juice cost - Juice
+  cool toy on top of the school - hold the right thumbstick to fly." for 6 seconds. Afterward, hold
+  the right thumbstick down near him for ~1.5s (any time, no on-screen countdown) to unlock flight,
+  then hold it down anywhere to fly in your look direction, with no ongoing Juice cost - Juice
   doubles as your health, so charging flight against it meant taking damage could silently ground
   you (`PlayerFlight.cs`, `IngotFlightTutor.cs`).
 - **The school**: a low-poly schoolhouse - deep red mottled walls, a flat dark roof that overhangs
@@ -108,12 +108,12 @@ normally does interactively haven't been done yet:
 
 - **Left thumbstick**: move (relative to where you're looking)
 - **Right thumbstick (flick left/right)**: snap turn
+- **Right thumbstick (press and hold)**: fly, once Ingot has taught you how - your floppy limbs
+  flail in the "wind" while airborne
 - **Swing your hands**: momentum melee - the faster you swing, the harder you hit
 - **Hold either trigger near a grabbable object** (e.g. the morningstar on the school roof): pick
   it up; release the trigger to drop or throw it
-- **Hold A (right controller)**: fly, once Ingot has taught you how - your floppy limbs flail in
-  the "wind" while airborne
-- **Walk into Ingot and hold A** for ~1.5 seconds: unlocks flight
+- **Walk into Ingot and hold the right thumbstick** for ~1.5 seconds: unlocks flight
 
 ## Known limitations
 

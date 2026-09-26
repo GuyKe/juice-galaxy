@@ -4,7 +4,7 @@ namespace JuiceGalaxy
 {
     /// <summary>
     /// The first time the player nears Ingot, he delivers one line for a few seconds; holding the
-    /// right controller's A button near him (for requiredHoldSeconds, any time after that) unlocks
+    /// right thumbstick down near him (for requiredHoldSeconds, any time after that) unlocks
     /// flight.
     /// </summary>
     public class IngotFlightTutor : MonoBehaviour
@@ -12,7 +12,7 @@ namespace JuiceGalaxy
         public WorldSpaceLabel promptLabel;
         // TextMesh doesn't word-wrap on its own, so the line is split by hand to keep it readable
         // instead of rendering as one very wide (or very tiny) strip of text.
-        public string introLine = "There's a cool toy on top of\nthe school, hold A to fly.";
+        public string introLine = "There's a cool toy on top\nof the school - hold the\nright thumbstick to fly.";
         public float introDuration = 6f;
         public float requiredHoldSeconds = 1.5f;
 
