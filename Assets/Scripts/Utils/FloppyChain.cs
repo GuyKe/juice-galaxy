@@ -48,12 +48,11 @@ namespace JuiceGalaxy
                 segGo.transform.SetParent(root.transform, false);
                 segGo.transform.position = spawnPos;
 
-                var visual = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                visual.name = "Visual";
+                var visual = new GameObject("Visual");
                 visual.transform.SetParent(segGo.transform, false);
-                visual.transform.localScale = Vector3.one * radius * 2f;
-                Object.Destroy(visual.GetComponent<Collider>());
-                var mr = visual.GetComponent<MeshRenderer>();
+                var mf = visual.AddComponent<MeshFilter>();
+                mf.sharedMesh = ProceduralMesh.CreateFlatShadedIcosphere(radius, 1);
+                var mr = visual.AddComponent<MeshRenderer>();
                 mr.sharedMaterial = material;
                 mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
                 chain.visuals[i] = visual.transform;

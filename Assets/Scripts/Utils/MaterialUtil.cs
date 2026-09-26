@@ -48,11 +48,16 @@ namespace JuiceGalaxy
             return mat;
         }
 
-        public static Material CreateUnlit(Color color)
+        public static Material CreateUnlit(Color color, Texture2D texture = null)
         {
             var mat = new Material(UnlitShader);
             if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", color);
             if (mat.HasProperty("_Color")) mat.SetColor("_Color", color);
+            if (texture != null)
+            {
+                if (mat.HasProperty("_BaseMap")) mat.SetTexture("_BaseMap", texture);
+                if (mat.HasProperty("_MainTex")) mat.SetTexture("_MainTex", texture);
+            }
             return mat;
         }
 
@@ -115,6 +120,44 @@ namespace JuiceGalaxy
                     float t = Mathf.Clamp01(noise[x, y]);
                     Color c = Color.Lerp(baseColor, accentColor, t);
                     tex.SetPixel(x, y, c);
+                }
+            }
+            tex.Apply();
+            return tex;
+        }
+
+        /// <summary>A trippy rainbow spiral on a dark background - used for Mrs. Slithers' swirling eyes.</summary>
+        public static Texture2D CreateSwirlTexture(int size = 64, int arms = 5)
+        {
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            tex.filterMode = FilterMode.Bilinear;
+            tex.wrapMode = TextureWrapMode.Clamp;
+
+            Vector2 center = new Vector2(size / 2f, size / 2f);
+            float maxRadius = size / 2f;
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    Vector2 p = new Vector2(x + 0.5f, y + 0.5f) - center;
+                    float radius = p.magnitude / maxRadius;
+                    if (radius > 1f)
+                    {
+                        tex.SetPixel(x, y, new Color(0, 0, 0, 0));
+                        continue;
+                    }
+
+                    float angle = Mathf.Atan2(p.y, p.x) / (Mathf.PI * 2f);
+                    float hue = Mathf.Repeat(angle * arms + radius * 1.6f, 1f);
+                    Color swirl = Color.HSVToRGB(hue, 0.9f, 1f);
+
+                    // Dark iris ring near the edge, tiny bright pupil dead center.
+                    Color c = radius < 0.18f
+                        ? Color.Lerp(Color.black, swirl, radius / 0.18f)
+                        : Color.Lerp(swirl, new Color(0.03f, 0.02f, 0.05f), Mathf.SmoothStep(0f, 1f, (radius - 0.6f) / 0.4f));
+
+                    tex.SetPixel(x, y, new Color(c.r, c.g, c.b, 1f));
                 }
             }
             tex.Apply();
