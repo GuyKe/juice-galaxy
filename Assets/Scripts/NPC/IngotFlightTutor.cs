@@ -4,15 +4,19 @@ using UnityEngine.InputSystem.XR;
 namespace JuiceGalaxy
 {
     /// <summary>
-    /// "Hold A to learn to fly." Tracks how long the player holds the A button near Ingot, and
-    /// cuts to a close-up on his face while he delivers his "you can fly now" line.
+    /// The first time the player nears Ingot, he delivers one line for a few seconds while the
+    /// camera cuts to a close-up on his face; holding the right controller's A button near him
+    /// (for requiredHoldSeconds, any time after that) unlocks flight.
     /// </summary>
     public class IngotFlightTutor : MonoBehaviour
     {
         public WorldSpaceLabel promptLabel;
         public Transform facePoint;
+        // TextMesh doesn't word-wrap on its own, so the line is split by hand to keep it readable
+        // instead of rendering as one very wide (or very tiny) strip of text.
+        public string introLine = "There's a cool toy on top of\nthe school, hold A to fly.";
+        public float introDuration = 6f;
         public float requiredHoldSeconds = 1.5f;
-        public float celebrationSeconds = 3f;
 
         // How fast the camera cuts to/from Ingot's face. Kept fast (a near-instant cut rather than
         // a slow dolly) since a lingering artificial camera move is a real VR discomfort risk.
@@ -20,8 +24,9 @@ namespace JuiceGalaxy
         public float closeUpDistance = 1.1f;
 
         bool _playerInside;
+        bool _hasIntroduced;
+        float _introTimer;
         float _holdTimer;
-        float _celebrationTimer;
         XRInputRig _rig;
         JuiceSystem _juice;
 
@@ -34,6 +39,14 @@ namespace JuiceGalaxy
             if (!other.CompareTag("Player")) return;
             _playerInside = true;
             CachePlayerRefs();
+
+            if (!_hasIntroduced && _juice != null && !_juice.flightUnlocked)
+            {
+                _hasIntroduced = true;
+                _introTimer = introDuration;
+                promptLabel.SetText(introLine);
+                promptLabel.SetVisible(true);
+            }
         }
 
         void OnTriggerExit(Collider other)
@@ -69,46 +82,31 @@ namespace JuiceGalaxy
         {
             if (_juice.flightUnlocked)
             {
-                if (_celebrationTimer > 0f)
-                {
-                    _celebrationTimer -= Time.deltaTime;
-                    if (_celebrationTimer <= 0f) promptLabel.SetVisible(false);
-                    return _celebrationTimer > 0f;
-                }
-                return false;
-            }
-
-            if (!_playerInside)
-            {
                 promptLabel.SetVisible(false);
                 return false;
             }
 
-            promptLabel.SetVisible(true);
+            if (_introTimer > 0f)
+            {
+                _introTimer -= Time.deltaTime;
+                if (_introTimer <= 0f) promptLabel.SetVisible(false);
+            }
 
-            bool holding = _rig != null && _rig.flyButtonAction.IsPressed();
+            bool holding = _playerInside && _rig != null && _rig.flyButtonAction.IsPressed();
             if (holding)
             {
                 _holdTimer += Time.deltaTime;
-                promptLabel.SetText($"Hold A to fly... {Mathf.CeilToInt(requiredHoldSeconds - _holdTimer)}");
-                if (_holdTimer >= requiredHoldSeconds)
-                {
-                    _juice.UnlockFlight();
-                    promptLabel.SetText("Great! You can fly now!");
-                    _celebrationTimer = celebrationSeconds;
-                }
+                if (_holdTimer >= requiredHoldSeconds) _juice.UnlockFlight();
             }
             else
             {
                 _holdTimer = Mathf.Max(0f, _holdTimer - Time.deltaTime * 2f);
-                promptLabel.SetText("Hold the A button to learn to fly!");
             }
 
-            // The camera cutscene is scoped to just this bounded "he's actually saying his line"
-            // window (celebrationSeconds long), not the open-ended waiting prompt above - freezing
-            // the player's real head tracking for an indefinite amount of time would be a much
-            // worse VR comfort problem than this brief scripted moment.
-            return false;
+            // The camera cutscene runs exactly as long as his one line is on screen - a short,
+            // bounded window rather than the open-ended waiting-for-A period, since freezing real
+            // head tracking indefinitely would be a much worse VR comfort problem than a brief cut.
+            return _introTimer > 0f;
         }
 
         void UpdateCameraFocus(bool talking)

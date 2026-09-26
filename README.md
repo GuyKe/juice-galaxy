@@ -38,12 +38,13 @@ imported art assets to go stale or break.
 - **Juice**: one resource that is simultaneously your health pool and your progression currency
   (`JuiceSystem.cs`). Crates drop Juice pickups; combat, getting crushed, or touching the spiked
   mine drains it.
-- **Flight**: locked until Ingot teaches you. Hold the right controller's **A** button near him for
-  ~1.5s to unlock it, then hold **A** anywhere to fly in your look direction (`PlayerFlight.cs`,
-  `IngotFlightTutor.cs`). The moment he delivers his line, the camera cuts to a brief close-up on
-  his face for the ~3 seconds he's "talking," then cuts back to your normal first-person view -
-  scoped to that one bounded beat rather than the whole open-ended waiting prompt, since freezing
-  real head tracking for an indefinite stretch is a real VR discomfort risk.
+- **Flight**: locked until Ingot teaches you. The first time you approach him he says "There's a
+  cool toy on top of the school, hold A to fly." for 6 seconds - the camera cuts to a close-up on
+  his face for exactly that window, then cuts back to your normal first-person view. Afterward,
+  hold the right controller's **A** button near him for ~1.5s (any time, no on-screen countdown) to
+  unlock flight, then hold **A** anywhere to fly in your look direction (`PlayerFlight.cs`,
+  `IngotFlightTutor.cs`). The cutscene is scoped to that one bounded line rather than an open-ended
+  waiting prompt, since freezing real head tracking indefinitely would be a real VR discomfort risk.
 - **The school**: a low-poly schoolhouse - deep red mottled walls, a flat dark roof that overhangs
   the walls on every side (with a grabbable morningstar resting on top), five plain dark cut-out
   windows, and a real walk-through doorway (not just a decal) leading to a teal/blue checkered

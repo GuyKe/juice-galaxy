@@ -15,6 +15,14 @@ namespace JuiceGalaxy
         public Rigidbody[] segments;
         public Transform[] visuals;
 
+        // A fast hand swing (momentum melee relies on exactly this) can move the driver several
+        // tens of centimeters in a single physics step. Teleporting the anchor straight there made
+        // the SpringJoints see a huge sudden stretch and fire back a violent corrective force,
+        // flinging segments into glitchy tangled poses. Capping how far the anchor can move per
+        // step - and clamping segment speed as a second safety net - keeps that bounded.
+        public float maxAnchorSpeed = 12f;
+        public float maxSegmentSpeed = 10f;
+
         public static FloppyChain Build(Transform parent, string name, Transform driver, int segmentCount,
             float segmentLength, float startRadius, float endRadius, Material material,
             float spring = 900f, float damper = 12f, float segmentMass = 0.4f)
@@ -86,8 +94,21 @@ namespace JuiceGalaxy
         void FixedUpdate()
         {
             if (driver == null || anchor == null) return;
-            anchor.MovePosition(driver.position);
+
+            Vector3 delta = driver.position - anchor.position;
+            float maxStep = maxAnchorSpeed * Time.fixedDeltaTime;
+            if (delta.magnitude > maxStep) delta = delta.normalized * maxStep;
+            anchor.MovePosition(anchor.position + delta);
             anchor.MoveRotation(driver.rotation);
+
+            if (segments == null) return;
+            float maxSqr = maxSegmentSpeed * maxSegmentSpeed;
+            foreach (var segment in segments)
+            {
+                if (segment == null) continue;
+                if (segment.velocity.sqrMagnitude > maxSqr)
+                    segment.velocity = segment.velocity.normalized * maxSegmentSpeed;
+            }
         }
 
         public Vector3 TipVelocity => segments != null && segments.Length > 0 ? segments[segments.Length - 1].velocity : Vector3.zero;
