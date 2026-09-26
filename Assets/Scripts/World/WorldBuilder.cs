@@ -8,7 +8,6 @@ namespace JuiceGalaxy
         public class Result
         {
             public Transform playerSpawn;
-            public Transform slithersSpawn;
             public Transform ingotSpawn;
         }
 
@@ -22,12 +21,11 @@ namespace JuiceGalaxy
             var playground = PlaygroundBuilder.Build(worldRoot, playgroundCenter);
 
             Vector3 islandCenter = new Vector3(-1.5f, 0f, -6f);
-            PlanetoidFieldBuilder.Build(worldRoot, islandCenter, new Vector2(26f, 30f));
+            PlanetoidFieldBuilder.Build(worldRoot, islandCenter, new Vector2(60f, 64f));
 
             return new Result
             {
                 playerSpawn = school.spawnPoint,
-                slithersSpawn = school.slithersSpawnPoint,
                 ingotSpawn = playground.ingotSpawnPoint
             };
         }

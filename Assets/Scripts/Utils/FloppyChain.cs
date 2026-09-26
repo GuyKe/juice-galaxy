@@ -4,7 +4,7 @@ namespace JuiceGalaxy
 {
     /// <summary>
     /// A physics-driven wobbly chain of spring-jointed segments - the building block for every
-    /// "floppy" character in the game (player limbs, Mrs. Slithers' body, Ingot's arms).
+    /// "floppy" character in the game (player limbs, Ingot's arms).
     /// A kinematic anchor is dragged along by a driver transform each frame and every segment
     /// behind it springs along for the ride, producing the elastic, jiggly look from the brief.
     /// </summary>

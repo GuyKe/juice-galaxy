@@ -4,16 +4,15 @@ using UnityEngine;
 namespace JuiceGalaxy
 {
     /// <summary>
-    /// Builds the school spawn room from the reference screenshot: mottled tan walls, a teal/blue
-    /// checkered floor, three colorful cut-out windows, rows of desks, and a blank blackboard where
-    /// Mrs. Slithers waits. Sits on a sealed, empty first floor the player can't get into.
+    /// Builds the school: deep red mottled walls with a flat dark overhanging roof and plain dark
+    /// window cutouts on the outside, a teal/blue checkered floor, rows of desks and a blank
+    /// blackboard on the inside. Sits on a sealed, empty first floor the player can't get into.
     /// </summary>
     public static class SchoolBuilder
     {
         public class Result
         {
             public Transform spawnPoint;
-            public Transform slithersSpawnPoint;
             public Transform blackboard;
         }
 
@@ -27,24 +26,23 @@ namespace JuiceGalaxy
             const float height = 7f;
             const float thickness = 0.3f;
 
-            var wallMat = MaterialUtil.CreateLit(new Color(0.62f, 0.5f, 0.32f),
-                MaterialUtil.CreateMottleTexture(new Color(0.62f, 0.5f, 0.32f), new Color(0.42f, 0.32f, 0.18f), 48, 3));
+            var wallMat = MaterialUtil.CreateLit(new Color(0.6f, 0.08f, 0.08f),
+                MaterialUtil.CreateMottleTexture(new Color(0.6f, 0.08f, 0.08f), new Color(0.4f, 0.04f, 0.05f), 48, 3));
             var floorMat = MaterialUtil.CreateLit(Color.white,
                 MaterialUtil.CreateCheckerTexture(new Color(0.35f, 0.62f, 0.55f), new Color(0.32f, 0.48f, 0.66f), 64, 10));
-            var ceilingMat = MaterialUtil.CreateLit(new Color(0.05f, 0.05f, 0.07f));
+            var roofMat = MaterialUtil.CreateLit(new Color(0.04f, 0.04f, 0.06f));
             var boardMat = MaterialUtil.CreateLit(new Color(0.05f, 0.05f, 0.05f));
-            var doorMat = MaterialUtil.CreateLit(new Color(0.4f, 0.22f, 0.12f),
-                MaterialUtil.CreateMottleTexture(new Color(0.4f, 0.22f, 0.12f), new Color(0.25f, 0.13f, 0.07f), 32, 9));
 
-            // Floor & ceiling
+            // Floor & a flat dark roof that overhangs the walls on every side.
             PrimBuilder.Plane(root, "Floor", Vector3.zero, new Vector2(length, depth), floorMat);
-            PrimBuilder.Cube(root, "Ceiling", new Vector3(0, height, 0), new Vector3(length, thickness, depth), ceilingMat);
+            const float roofOverhang = 0.7f;
+            PrimBuilder.Cube(root, "Roof", new Vector3(0, height, 0), new Vector3(length + roofOverhang, thickness, depth + roofOverhang), roofMat);
 
             // A sealed, empty first floor beneath the classroom - solid on every side, so it's
             // just there to ground the building and can't actually be entered.
             BuildFirstFloor(root, length, depth, wallMat);
 
-            // Back wall (+Z) holds the blackboard - Mrs. Slithers' domain.
+            // Back wall (+Z) holds the blackboard.
             var backWall = new GameObject("BackWall").transform;
             backWall.SetParent(root, false);
             backWall.localPosition = new Vector3(0, 0, depth / 2f);
@@ -54,13 +52,13 @@ namespace JuiceGalaxy
             var blackboard = PrimBuilder.Cube(backWall, "Blackboard", new Vector3(1.5f, 2.1f, -thickness / 2f - 0.02f),
                 new Vector3(4.2f, 1.9f, 0.05f), boardMat, false).transform;
 
-            // Front wall (-Z) has the doorway the player spawns near.
+            // Front wall (-Z) has an actual walk-through doorway (not just a decal) the player
+            // spawns near - otherwise the room would be sealed and unreachable from outside.
             var frontWall = new GameObject("FrontWall").transform;
             frontWall.SetParent(root, false);
             frontWall.localPosition = new Vector3(0, 0, -depth / 2f);
             frontWall.localRotation = Quaternion.Euler(0, 180f, 0);
-            BuildPlainWall(frontWall, length, height, thickness, wallMat);
-            PrimBuilder.Cube(frontWall, "Door", new Vector3(-3.5f, 1.1f, -thickness / 2f - 0.02f), new Vector3(1.2f, 2.2f, 0.05f), doorMat, false);
+            BuildWallWithDoor(frontWall, length, height, thickness, wallMat, -3.5f, 1.6f, 2.4f);
 
             // Right wall (+X), plain.
             var rightWall = new GameObject("RightWall").transform;
@@ -69,7 +67,7 @@ namespace JuiceGalaxy
             rightWall.localRotation = Quaternion.Euler(0, -90f, 0);
             BuildPlainWall(rightWall, depth, height, thickness, wallMat);
 
-            // Left wall (-X): three colorful cut-out windows, like the reference image.
+            // Left wall (-X): five plain dark cut-out windows, like the reference image.
             var leftWall = new GameObject("LeftWall").transform;
             leftWall.SetParent(root, false);
             leftWall.localPosition = new Vector3(-length / 2f, 0, 0);
@@ -83,14 +81,9 @@ namespace JuiceGalaxy
             spawnPoint.localPosition = new Vector3(0, 0, -depth / 2f + 2f);
             spawnPoint.localRotation = Quaternion.Euler(0, 0, 0);
 
-            var slithersSpawn = new GameObject("SlithersSpawnPoint").transform;
-            slithersSpawn.SetParent(root, false);
-            slithersSpawn.localPosition = new Vector3(2.6f, 0, depth / 2f - 1f);
-            slithersSpawn.localRotation = Quaternion.Euler(0, 180f, 0);
-
             AddDirectionalLightIfMissing();
 
-            return new Result { spawnPoint = spawnPoint, slithersSpawnPoint = slithersSpawn, blackboard = blackboard };
+            return new Result { spawnPoint = spawnPoint, blackboard = blackboard };
         }
 
         static void BuildPlainWall(Transform wallRoot, float wallLength, float wallHeight, float thickness, Material mat)
@@ -98,18 +91,50 @@ namespace JuiceGalaxy
             PrimBuilder.Cube(wallRoot, "Wall", new Vector3(0, wallHeight / 2f, 0), new Vector3(wallLength, wallHeight, thickness), mat);
         }
 
+        /// <summary>A wall with an actual open doorway (floor to <paramref name="doorHeight"/>) - side
+        /// pillars and a lintel above the gap, but nothing blocking the opening itself.</summary>
+        static void BuildWallWithDoor(Transform wallRoot, float wallLength, float wallHeight, float thickness,
+            Material mat, float doorCenter, float doorWidth, float doorHeight)
+        {
+            float halfLen = wallLength / 2f;
+            float dStart = doorCenter - doorWidth / 2f;
+            float dEnd = doorCenter + doorWidth / 2f;
+
+            float leftWidth = dStart - (-halfLen);
+            if (leftWidth > 0.02f)
+                PrimBuilder.Cube(wallRoot, "Wall_Left", new Vector3(-halfLen + leftWidth / 2f, wallHeight / 2f, 0),
+                    new Vector3(leftWidth, wallHeight, thickness), mat);
+
+            float rightWidth = halfLen - dEnd;
+            if (rightWidth > 0.02f)
+                PrimBuilder.Cube(wallRoot, "Wall_Right", new Vector3(halfLen - rightWidth / 2f, wallHeight / 2f, 0),
+                    new Vector3(rightWidth, wallHeight, thickness), mat);
+
+            float lintelHeight = wallHeight - doorHeight;
+            if (lintelHeight > 0.02f)
+                PrimBuilder.Cube(wallRoot, "Wall_Lintel", new Vector3(doorCenter, doorHeight + lintelHeight / 2f, 0),
+                    new Vector3(doorWidth, lintelHeight, thickness), mat);
+        }
+
         static void BuildWindowWall(Transform wallRoot, float wallLength, float wallHeight, float thickness, Material mat)
         {
             float sillBottom = 1.1f;
-            float windowHeight = 1.3f;
+            float windowHeight = 1f;
             float sillTop = sillBottom + windowHeight;
 
-            var windows = new (float center, float width, Color color)[]
+            // Five plain dark square-ish cutouts evenly spaced along the wall, like the reference,
+            // sized to leave a visible pillar of wall between each one regardless of wall length.
+            const int windowCount = 5;
+            float usableSpan = wallLength * 0.84f;
+            float slot = usableSpan / windowCount;
+            float windowWidth = Mathf.Min(windowHeight, slot * 0.62f);
+            var darkWindow = new Color(0.03f, 0.03f, 0.04f);
+            var windows = new (float center, float width, Color color)[windowCount];
+            for (int i = 0; i < windowCount; i++)
             {
-                (-wallLength * 0.32f, 1.5f, new Color(0.85f, 0.15f, 0.15f)),
-                (0f,                   1.5f, new Color(0.95f, 0.55f, 0.15f)),
-                (wallLength * 0.32f,  1.4f, new Color(0.85f, 0.9f, 0.75f)),
-            };
+                float t = (i + 0.5f) / windowCount;
+                windows[i] = (Mathf.Lerp(-usableSpan / 2f, usableSpan / 2f, t), windowWidth, darkWindow);
+            }
 
             // Bottom band (floor to sill) and top band (sill+window to ceiling) run the full length.
             PrimBuilder.Cube(wallRoot, "Wall_Bottom", new Vector3(0, sillBottom / 2f, 0), new Vector3(wallLength, sillBottom, thickness), mat);

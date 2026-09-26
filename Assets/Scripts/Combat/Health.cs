@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace JuiceGalaxy
 {
-    /// <summary>Generic damageable component used by the player, Mrs. Slithers, creatures and crates.</summary>
+    /// <summary>Generic damageable component used by the player, NPCs and crates.</summary>
     public class Health : MonoBehaviour
     {
         public float maxHealth = 100f;

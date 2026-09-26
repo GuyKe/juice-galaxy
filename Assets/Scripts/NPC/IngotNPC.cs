@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JuiceGalaxy
 {
-    /// <summary>Builds Ingot: a friendly golden bar-shaped NPC who teaches the player to fly.</summary>
+    /// <summary>Builds Ingot: a round, dark, googly-eyed creature who teaches the player to fly.</summary>
     public static class IngotNPC
     {
         public static Transform Spawn(Transform parent, Vector3 position, Quaternion rotation)
@@ -12,74 +12,66 @@ namespace JuiceGalaxy
             root.position = position;
             root.rotation = rotation;
 
-            var goldMat = MaterialUtil.CreateLit(new Color(0.95f, 0.78f, 0.15f));
-            if (goldMat.HasProperty("_Smoothness")) goldMat.SetFloat("_Smoothness", 0.75f);
-            if (goldMat.HasProperty("_Metallic")) goldMat.SetFloat("_Metallic", 0.6f);
+            var darkMat = MaterialUtil.CreateLit(new Color(0.08f, 0.08f, 0.09f));
+            if (darkMat.HasProperty("_Smoothness")) darkMat.SetFloat("_Smoothness", 0.7f);
+            if (darkMat.HasProperty("_Metallic")) darkMat.SetFloat("_Metallic", 0.5f);
+            var whiteMat = MaterialUtil.CreateLit(new Color(0.93f, 0.9f, 0.85f));
+            var blackMat = MaterialUtil.CreateLit(new Color(0.03f, 0.03f, 0.03f));
+
+            const float bodyRadius = 0.42f;
+            const float headRadius = 0.22f;
 
             var body = new GameObject("Body").transform;
             body.SetParent(root, false);
-            body.localPosition = new Vector3(0, 0.75f, 0);
+            body.localPosition = new Vector3(0, bodyRadius + 0.03f, 0);
 
-            var bar = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            bar.name = "BarVisual";
-            bar.transform.SetParent(body, false);
-            bar.transform.localScale = new Vector3(0.55f, 0.75f, 0.35f);
-            bar.GetComponent<MeshRenderer>().sharedMaterial = goldMat;
+            var bodyVisual = new GameObject("BodyVisual");
+            bodyVisual.transform.SetParent(body, false);
+            var bodyMf = bodyVisual.AddComponent<MeshFilter>();
+            bodyMf.sharedMesh = ProceduralMesh.CreateFlatShadedIcosphere(bodyRadius, 2);
+            bodyVisual.AddComponent<MeshRenderer>().sharedMaterial = darkMat;
 
-            var whiteMat = MaterialUtil.CreateLit(Color.white);
-            var blackMat = MaterialUtil.CreateLit(new Color(0.05f, 0.05f, 0.05f));
-            foreach (float side in new[] { -1f, 1f })
-            {
-                var eye = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                eye.transform.SetParent(body, false);
-                eye.transform.localPosition = new Vector3(side * 0.13f, 0.12f, 0.18f);
-                eye.transform.localScale = Vector3.one * 0.12f;
-                Object.Destroy(eye.GetComponent<Collider>());
-                eye.GetComponent<MeshRenderer>().sharedMaterial = whiteMat;
+            var head = new GameObject("Head").transform;
+            head.SetParent(body, false);
+            head.localPosition = new Vector3(0, bodyRadius * 0.75f, bodyRadius * 0.2f);
+            var headMf = head.gameObject.AddComponent<MeshFilter>();
+            headMf.sharedMesh = ProceduralMesh.CreateFlatShadedIcosphere(headRadius, 1);
+            head.gameObject.AddComponent<MeshRenderer>().sharedMaterial = darkMat;
 
-                var pupil = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                pupil.transform.SetParent(eye.transform, false);
-                pupil.transform.localPosition = new Vector3(0, 0, 0.6f);
-                pupil.transform.localScale = Vector3.one * 0.5f;
-                Object.Destroy(pupil.GetComponent<Collider>());
-                pupil.GetComponent<MeshRenderer>().sharedMaterial = blackMat;
-            }
+            BuildFace(head, whiteMat, blackMat, headRadius);
 
-            var smile = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            smile.transform.SetParent(body, false);
-            smile.transform.localPosition = new Vector3(0, -0.08f, 0.18f);
-            smile.transform.localScale = new Vector3(0.22f, 0.04f, 0.05f);
-            Object.Destroy(smile.GetComponent<Collider>());
-            smile.GetComponent<MeshRenderer>().sharedMaterial = blackMat;
-
-            // Floppy dangling arms and legs.
+            // Floppy dangling arms and legs, dark like the body, each capped with a pale tip.
             var leftShoulder = new GameObject("LeftShoulder").transform;
             leftShoulder.SetParent(body, false);
-            leftShoulder.localPosition = new Vector3(-0.3f, 0.25f, 0);
+            leftShoulder.localPosition = new Vector3(-bodyRadius * 0.8f, bodyRadius * 0.15f, 0);
             var rightShoulder = new GameObject("RightShoulder").transform;
             rightShoulder.SetParent(body, false);
-            rightShoulder.localPosition = new Vector3(0.3f, 0.25f, 0);
+            rightShoulder.localPosition = new Vector3(bodyRadius * 0.8f, bodyRadius * 0.15f, 0);
             var leftHip = new GameObject("LeftHip").transform;
             leftHip.SetParent(body, false);
-            leftHip.localPosition = new Vector3(-0.15f, -0.4f, 0);
+            leftHip.localPosition = new Vector3(-bodyRadius * 0.45f, -bodyRadius * 0.85f, 0);
             var rightHip = new GameObject("RightHip").transform;
             rightHip.SetParent(body, false);
-            rightHip.localPosition = new Vector3(0.15f, -0.4f, 0);
+            rightHip.localPosition = new Vector3(bodyRadius * 0.45f, -bodyRadius * 0.85f, 0);
+            var tailRoot = new GameObject("TailRoot").transform;
+            tailRoot.SetParent(body, false);
+            tailRoot.localPosition = new Vector3(bodyRadius * 0.3f, bodyRadius * 0.7f, -bodyRadius * 0.3f);
 
-            FloppyChain.Build(root, "LeftArm", leftShoulder, 3, 0.16f, 0.09f, 0.05f, goldMat);
-            FloppyChain.Build(root, "RightArm", rightShoulder, 3, 0.16f, 0.09f, 0.05f, goldMat);
-            FloppyChain.Build(root, "LeftLeg", leftHip, 3, 0.18f, 0.1f, 0.06f, goldMat);
-            FloppyChain.Build(root, "RightLeg", rightHip, 3, 0.18f, 0.1f, 0.06f, goldMat);
+            AddCappedLimb(root, "LeftArm", leftShoulder, 3, 0.16f, 0.09f, 0.05f, darkMat, whiteMat);
+            AddCappedLimb(root, "RightArm", rightShoulder, 3, 0.16f, 0.09f, 0.05f, darkMat, whiteMat);
+            AddCappedLimb(root, "LeftLeg", leftHip, 3, 0.15f, 0.08f, 0.05f, darkMat, whiteMat);
+            AddCappedLimb(root, "RightLeg", rightHip, 3, 0.15f, 0.08f, 0.05f, darkMat, whiteMat);
+            AddCappedLimb(root, "Tail", tailRoot, 3, 0.13f, 0.05f, 0.02f, darkMat, whiteMat);
 
-            var label = WorldSpaceLabel.Create(body, new Vector3(0, 1.1f, 0), "Ingot", new Color(1f, 0.95f, 0.6f));
+            var label = WorldSpaceLabel.Create(body, new Vector3(0, 0.95f, 0), "Ingot", new Color(0.95f, 0.9f, 0.8f));
 
-            var promptLabel = WorldSpaceLabel.Create(body, new Vector3(0, 0.85f, 0), "", Color.white, 32, 0.2f);
+            var promptLabel = WorldSpaceLabel.Create(body, new Vector3(0, 0.72f, 0), "", Color.white, 32, 0.2f);
             promptLabel.SetVisible(false);
 
             var trigger = root.gameObject.AddComponent<SphereCollider>();
             trigger.isTrigger = true;
             trigger.radius = 3f;
-            trigger.center = new Vector3(0, 0.9f, 0);
+            trigger.center = new Vector3(0, bodyRadius, 0);
             var rb = root.gameObject.AddComponent<Rigidbody>();
             rb.isKinematic = true;
             rb.useGravity = false;
@@ -88,6 +80,58 @@ namespace JuiceGalaxy
             tutor.promptLabel = promptLabel;
 
             return root;
+        }
+
+        static void BuildFace(Transform head, Material whiteMat, Material blackMat, float headRadius)
+        {
+            foreach (float side in new[] { -1f, 1f })
+            {
+                var eye = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                eye.name = "Eye";
+                eye.transform.SetParent(head, false);
+                eye.transform.localPosition = new Vector3(side * headRadius * 0.45f, headRadius * 0.25f, headRadius * 0.85f);
+                eye.transform.localRotation = Quaternion.Euler(0, 0, side * -25f);
+                eye.transform.localScale = new Vector3(headRadius * 0.55f, headRadius * 0.22f, headRadius * 0.18f);
+                Object.Destroy(eye.GetComponent<Collider>());
+                eye.GetComponent<MeshRenderer>().sharedMaterial = whiteMat;
+            }
+
+            var mouth = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            mouth.name = "Mouth";
+            mouth.transform.SetParent(head, false);
+            mouth.transform.localPosition = new Vector3(0, -headRadius * 0.3f, headRadius * 0.85f);
+            mouth.transform.localScale = new Vector3(headRadius * 0.75f, headRadius * 0.32f, headRadius * 0.1f);
+            Object.Destroy(mouth.GetComponent<Collider>());
+            mouth.GetComponent<MeshRenderer>().sharedMaterial = blackMat;
+
+            for (int i = 0; i < 3; i++)
+            {
+                float x = Mathf.Lerp(-0.3f, 0.3f, i / 2f);
+                var tooth = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                tooth.name = "Tooth";
+                tooth.transform.SetParent(mouth.transform, false);
+                tooth.transform.localPosition = new Vector3(x, 0.55f, 0.6f);
+                tooth.transform.localScale = new Vector3(0.4f, 0.9f, 0.4f);
+                Object.Destroy(tooth.GetComponent<Collider>());
+                tooth.GetComponent<MeshRenderer>().sharedMaterial = whiteMat;
+            }
+        }
+
+        static void AddCappedLimb(Transform root, string name, Transform driver, int segments, float segmentLength,
+            float startRadius, float endRadius, Material limbMat, Material tipMat)
+        {
+            var chain = FloppyChain.Build(root, name, driver, segments, segmentLength, startRadius, endRadius, limbMat);
+            var tip = chain.TipTransform;
+            if (tip == null) return;
+
+            // The chain's visuals are unscaled meshes sized in world units, so the cap must be
+            // scaled from the actual tip radius rather than a flat multiplier.
+            var cap = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            cap.name = "Tip";
+            cap.transform.SetParent(tip, false);
+            cap.transform.localScale = Vector3.one * endRadius * 2.2f;
+            Object.Destroy(cap.GetComponent<Collider>());
+            cap.GetComponent<MeshRenderer>().sharedMaterial = tipMat;
         }
     }
 }

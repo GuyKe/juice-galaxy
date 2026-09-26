@@ -86,8 +86,8 @@ namespace JuiceGalaxy
             col.isTrigger = true;
 
             // A kinematic Rigidbody is required for trigger events against other kinematic/static
-            // colliders (e.g. Mrs. Slithers' head, wobbly creatures) since neither the hand-tracked
-            // fist nor those targets are driven by normal physics forces.
+            // colliders since neither the hand-tracked fist nor those targets are driven by normal
+            // physics forces.
             var rb = fist.AddComponent<Rigidbody>();
             rb.isKinematic = true;
             rb.useGravity = false;

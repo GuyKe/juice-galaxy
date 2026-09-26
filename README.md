@@ -1,22 +1,22 @@
 # Juice Galaxy
 
 A chaotic, physics-driven VR action game for **Meta Quest**, built natively in Unity (URP + OpenXR).
-You play a highly elastic, floppy little creature exploring a school and its playground under a
-psychedelic rainbow sky, using momentum-based melee combat, and chugging **Juice** - the game's
-single resource for health, currency and unlocking new abilities.
+You play a highly elastic, floppy little creature exploring a school and its sprawling playground
+under a psychedelic rainbow sky, using momentum-based melee combat, and chugging **Juice** - the
+game's single resource for health, currency and unlocking new abilities.
 
-You spawn in a fever-dream classroom watched over by **Mrs. Slithers**, a floppy, weird snake
-teacher who lurks by her blackboard. Out the door is a playground with cracked green turf, crate
-stacks (they give Juice, but a toppling stack can crush you), a spiked mine, a stone wall with
-painted-on lips, a hue-cycling rainbow bouncy ball, and **Ingot**, who will teach you to fly if you
-hold the **A** button near him.
+You spawn in a fever-dream classroom inside a tall red schoolhouse. Out the door - a real,
+walk-through doorway - is a wide playground with cracked green turf, crate stacks (they give
+Juice, but a toppling stack can crush you), a spiked mine, a stone wall with painted-on lips, a
+hue-cycling rainbow bouncy ball, and **Ingot**, a round, dark, googly-eyed creature who will teach
+you to fly if you hold the **A** button near him.
 
 This whole project is generated **entirely from code** - there is one hand-authored Unity scene
 (`Assets/Scenes/Bootstrap.unity`) containing a single empty GameObject running `GameBootstrap.cs`.
 Everything else - the school, the playground, the player's XR rig, the floppy character rigs,
-Mrs. Slithers, Ingot, the enemies, and the HUD - is built at runtime in `Awake()` using primitive
-meshes, procedurally generated low-poly icospheres, and procedurally generated textures. There are
-no imported art assets to go stale or break.
+Ingot, the enemies, and the HUD - is built at runtime in `Awake()` using primitive meshes,
+procedurally generated low-poly icospheres, and procedurally generated textures. There are no
+imported art assets to go stale or break.
 
 ## What's implemented
 
@@ -26,27 +26,26 @@ no imported art assets to go stale or break.
   movement/collision) with a purely cosmetic elastic body - jiggly tentacle-sleeve arms trailing
   from your tracked hands and a floppy tail, all built from spring-jointed physics chains
   (`FloppyChain.cs`).
-- **Momentum-based melee combat**: your fists (and Mrs. Slithers' head) track their own real-world
-  velocity every physics step; damage scales with how fast you actually swing
-  (`MomentumMeleeHitbox.cs`).
+- **Momentum-based melee combat**: your fists track their own real-world velocity every physics
+  step; damage scales with how fast you actually swing (`MomentumMeleeHitbox.cs`).
 - **Juice**: one resource that is simultaneously your health pool and your progression currency
   (`JuiceSystem.cs`). Crates drop Juice pickups; combat, getting crushed, or touching the spiked
   mine drains it.
 - **Flight**: locked until Ingot teaches you. Hold the right controller's **A** button near him for
   ~1.5s to unlock it, then hold **A** anywhere to fly in your look direction (`PlayerFlight.cs`,
   `IngotFlightTutor.cs`).
-- **The school**: a low-poly classroom matching the reference art direction - mottled tan walls, a
-  teal/blue checkered floor, three colorful cut-out windows, rows of desks, and a blank blackboard,
-  sitting on a sealed, empty first floor the player can't get into (`SchoolBuilder.cs`).
-- **The playground**: cracked green turf, crate stacks that reward Juice when punched apart but can
-  crush you if they topple onto you (`CrateStack.cs`, `CrushHazard.cs`), a floating spiked mine
-  that damages on contact (`SpikeHazard.cs`), a stone wall with painted-on lips
-  (`PlaygroundBuilder.cs`), and a rainbow bouncy ball (`RainbowBouncyBall.cs`).
-- **Mrs. Slithers**: a big floppy, weird snake NPC/mini-boss with a spring-jointed noodle body,
-  swirling psychedelic eyes and fangs, who idles, notices, and lunges at the player
-  (`MrsSlithersNPC.cs`, `MrsSlithersAI.cs`).
-- **Ingot**: a friendly golden bar-shaped NPC with floppy limbs who teaches flight
-  (`IngotNPC.cs`).
+- **The school**: a low-poly schoolhouse - deep red mottled walls, a flat dark roof that overhangs
+  the walls on every side, five plain dark cut-out windows, and a real walk-through doorway (not
+  just a decal) leading to a teal/blue checkered classroom floor, rows of desks, and a blank
+  blackboard, all sitting on a sealed, empty first floor the player can't get into
+  (`SchoolBuilder.cs`).
+- **The playground**: a wide stretch of cracked green turf, crate stacks that reward Juice when
+  punched apart but can crush you if they topple onto you (`CrateStack.cs`, `CrushHazard.cs`), a
+  floating spiked mine that damages on contact (`SpikeHazard.cs`), a stone wall with painted-on
+  lips and a couple of dark obelisks (`PlaygroundBuilder.cs`), and a rainbow bouncy ball
+  (`RainbowBouncyBall.cs`).
+- **Ingot**: a round, dark, googly-eyed creature with floppy limbs and pale hand/foot tips who
+  teaches flight (`IngotNPC.cs`).
 - **HUD**: segmented health/Juice bars pinned to the top-left of view, styled after the reference
   screenshot (`JuiceBarUI.cs`).
 
@@ -61,7 +60,7 @@ Assets/
     Player/                   Locomotion, momentum melee fists, flight, floppy visuals
     Combat/                   Health, MomentumMeleeHitbox, CrushHazard
     World/                    School, playground, rainbow sky/island base, crates, pickups, bouncy ball
-    NPC/                      Mrs. Slithers, Ingot, and their AI
+    NPC/                      Ingot and its flight-teaching trigger
     UI/                       World-space labels, HUD bars
     Utils/                    Procedural meshes/textures, primitive builders, FloppyChain
 ```

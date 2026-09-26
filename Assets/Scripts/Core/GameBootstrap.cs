@@ -20,9 +20,6 @@ namespace JuiceGalaxy
             Quaternion spawnRot = world.playerSpawn != null ? world.playerSpawn.rotation : Quaternion.identity;
             var player = PlayerFactory.Spawn(spawnPos, spawnRot);
 
-            if (world.slithersSpawn != null)
-                MrsSlithersNPC.Spawn(null, world.slithersSpawn.position, world.slithersSpawn.rotation);
-
             if (world.ingotSpawn != null)
                 IngotNPC.Spawn(null, world.ingotSpawn.position, world.ingotSpawn.rotation);
 
