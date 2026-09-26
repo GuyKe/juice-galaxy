@@ -33,8 +33,9 @@ namespace JuiceGalaxy
             var flight = playerGo.AddComponent<PlayerFlight>();
             flight.Init(xrRig, floppyController, juice);
 
-            BuildFloppyVisuals(playerGo.transform, xrRig);
+            flight.windChains = BuildFloppyVisuals(playerGo.transform, xrRig);
             BuildFists(xrRig, playerGo);
+            BuildHandGrabbers(xrRig, playerGo);
 
             var gm = GameManager.Instance;
             if (gm != null) gm.RegisterPlayer(playerGo.transform, juice, health, xrRig.headCamera);
@@ -42,7 +43,7 @@ namespace JuiceGalaxy
             return playerGo.transform;
         }
 
-        static void BuildFloppyVisuals(Transform playerRoot, XRInputRig rig)
+        static FloppyChain[] BuildFloppyVisuals(Transform playerRoot, XRInputRig rig)
         {
             var bodyMat = MaterialUtil.CreateLit(new Color(0.85f, 0.25f, 0.65f),
                 MaterialUtil.CreateMottleTexture(new Color(0.85f, 0.25f, 0.65f), new Color(1f, 0.55f, 0.1f), 32, 7));
@@ -64,11 +65,13 @@ namespace JuiceGalaxy
             torso.GetComponent<MeshRenderer>().sharedMaterial = bodyMat;
 
             // Floppy tentacle sleeves dangling from each hand.
-            FloppyChain.Build(playerRoot, "LeftSleeve", rig.leftHand, 4, 0.09f, 0.06f, 0.02f, bodyMat);
-            FloppyChain.Build(playerRoot, "RightSleeve", rig.rightHand, 4, 0.09f, 0.06f, 0.02f, bodyMat);
+            var leftSleeve = FloppyChain.Build(playerRoot, "LeftSleeve", rig.leftHand, 4, 0.09f, 0.06f, 0.02f, bodyMat);
+            var rightSleeve = FloppyChain.Build(playerRoot, "RightSleeve", rig.rightHand, 4, 0.09f, 0.06f, 0.02f, bodyMat);
 
             // Floppy tail dangling from the torso.
-            FloppyChain.Build(playerRoot, "Tail", torsoHolder.transform, 5, 0.1f, 0.07f, 0.015f, bodyMat);
+            var tail = FloppyChain.Build(playerRoot, "Tail", torsoHolder.transform, 5, 0.1f, 0.07f, 0.015f, bodyMat);
+
+            return new[] { leftSleeve, rightSleeve, tail };
         }
 
         static void BuildFists(XRInputRig rig, GameObject owner)
@@ -94,6 +97,15 @@ namespace JuiceGalaxy
 
             var hitbox = fist.AddComponent<MomentumMeleeHitbox>();
             hitbox.owner = owner;
+        }
+
+        static void BuildHandGrabbers(XRInputRig rig, GameObject owner)
+        {
+            var left = owner.AddComponent<HandGrabber>();
+            left.Init(rig.leftHand, rig.leftTriggerAction, owner);
+
+            var right = owner.AddComponent<HandGrabber>();
+            right.Init(rig.rightHand, rig.rightTriggerAction, owner);
         }
     }
 }

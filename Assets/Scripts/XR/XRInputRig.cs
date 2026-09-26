@@ -7,7 +7,7 @@ namespace JuiceGalaxy
     /// <summary>
     /// Builds the head + hand tracking rig entirely at runtime via the Input System's XR device
     /// layouts (fed by OpenXR), so no hand-authored prefab or .inputactions asset is required.
-    /// Exposes the raw actions other scripts (locomotion, flight, melee) read from.
+    /// Exposes the raw actions other scripts (locomotion, flight, melee, grabbing) read from.
     /// </summary>
     public class XRInputRig : MonoBehaviour
     {
@@ -19,8 +19,8 @@ namespace JuiceGalaxy
         public InputAction moveAction { get; private set; }
         public InputAction turnAction { get; private set; }
         public InputAction flyButtonAction { get; private set; }
-        public InputAction leftGripAction { get; private set; }
-        public InputAction rightGripAction { get; private set; }
+        public InputAction leftTriggerAction { get; private set; }
+        public InputAction rightTriggerAction { get; private set; }
 
         public static XRInputRig Build(Transform parent)
         {
@@ -46,14 +46,14 @@ namespace JuiceGalaxy
             moveAction = new InputAction("Move", InputActionType.Value, "<XRController>{LeftHand}/primary2DAxis", expectedControlType: "Vector2");
             turnAction = new InputAction("Turn", InputActionType.Value, "<XRController>{RightHand}/primary2DAxis", expectedControlType: "Vector2");
             flyButtonAction = new InputAction("Fly", InputActionType.Button, "<XRController>{RightHand}/primaryButton");
-            leftGripAction = new InputAction("LeftGrip", InputActionType.Value, "<XRController>{LeftHand}/grip", expectedControlType: "Axis");
-            rightGripAction = new InputAction("RightGrip", InputActionType.Value, "<XRController>{RightHand}/grip", expectedControlType: "Axis");
+            leftTriggerAction = new InputAction("LeftTrigger", InputActionType.Value, "<XRController>{LeftHand}/trigger", expectedControlType: "Axis");
+            rightTriggerAction = new InputAction("RightTrigger", InputActionType.Value, "<XRController>{RightHand}/trigger", expectedControlType: "Axis");
 
             moveAction.Enable();
             turnAction.Enable();
             flyButtonAction.Enable();
-            leftGripAction.Enable();
-            rightGripAction.Enable();
+            leftTriggerAction.Enable();
+            rightTriggerAction.Enable();
         }
 
         Transform CreateTracked(string name, string posBinding, string rotBinding, string posControlType, string rotControlType)
@@ -81,8 +81,8 @@ namespace JuiceGalaxy
             moveAction?.Disable();
             turnAction?.Disable();
             flyButtonAction?.Disable();
-            leftGripAction?.Disable();
-            rightGripAction?.Disable();
+            leftTriggerAction?.Disable();
+            rightTriggerAction?.Disable();
         }
     }
 }

@@ -28,6 +28,13 @@ imported art assets to go stale or break.
   (`FloppyChain.cs`).
 - **Momentum-based melee combat**: your fists track their own real-world velocity every physics
   step; damage scales with how fast you actually swing (`MomentumMeleeHitbox.cs`).
+- **Grabbing**: hold a controller trigger near a `Grabbable` object (e.g. the roof's morningstar)
+  to pick it up - it snaps into your hand and follows it exactly, momentum melee and all; let go of
+  the trigger to drop or throw it with your hand's current velocity (`Grabbable.cs`,
+  `HandGrabber.cs`).
+- **Ragdoll flight**: while flying, your floppy sleeves and tail get blown backward by "wind"
+  force proportional to your flight speed, so your whole floppy body flails instead of just
+  trailing limply (`PlayerFlight.cs`).
 - **Juice**: one resource that is simultaneously your health pool and your progression currency
   (`JuiceSystem.cs`). Crates drop Juice pickups; combat, getting crushed, or touching the spiked
   mine drains it.
@@ -35,14 +42,15 @@ imported art assets to go stale or break.
   ~1.5s to unlock it, then hold **A** anywhere to fly in your look direction (`PlayerFlight.cs`,
   `IngotFlightTutor.cs`).
 - **The school**: a low-poly schoolhouse - deep red mottled walls, a flat dark roof that overhangs
-  the walls on every side, five plain dark cut-out windows, and a real walk-through doorway (not
-  just a decal) leading to a teal/blue checkered classroom floor, rows of desks, and a blank
-  blackboard, all sitting on a sealed, empty first floor the player can't get into
-  (`SchoolBuilder.cs`).
-- **The playground**: a wide stretch of cracked green turf, crate stacks that reward Juice when
-  punched apart but can crush you if they topple onto you (`CrateStack.cs`, `CrushHazard.cs`), a
-  floating spiked mine that damages on contact (`SpikeHazard.cs`), a stone wall with painted-on
-  lips and a couple of dark obelisks (`PlaygroundBuilder.cs`), and a rainbow bouncy ball
+  the walls on every side (with a grabbable morningstar resting on top), five plain dark cut-out
+  windows, and a real walk-through doorway (not just a decal) leading to a teal/blue checkered
+  classroom floor, rows of desks, and a blank blackboard, all sitting on a sealed, empty first
+  floor the player can't get into (`SchoolBuilder.cs`, `MorningstarProp.cs`).
+- **The playground**: a long stretch of cracked green turf, crate stacks scattered near, in the
+  middle of, and far along the field that reward Juice when punched apart but can crush you if
+  they topple onto you (`CrateStack.cs`, `CrushHazard.cs`), a floating spiked mine that damages on
+  contact (`SpikeHazard.cs`), a massive stone wall with painted-on lips waiting at the very far end
+  and a couple of dark obelisks (`PlaygroundBuilder.cs`), and a rainbow bouncy ball
   (`RainbowBouncyBall.cs`).
 - **Ingot**: a round, dark, googly-eyed creature with floppy limbs and pale hand/foot tips who
   teaches flight (`IngotNPC.cs`).
@@ -57,7 +65,7 @@ Assets/
   Scripts/
     Core/                     GameBootstrap, GameManager, JuiceSystem
     XR/                       Runtime-built XR head/hand tracking + input actions
-    Player/                   Locomotion, momentum melee fists, flight, floppy visuals
+    Player/                   Locomotion, momentum melee fists, flight, floppy visuals, grabbing
     Combat/                   Health, MomentumMeleeHitbox, CrushHazard
     World/                    School, playground, rainbow sky/island base, crates, pickups, bouncy ball
     NPC/                      Ingot and its flight-teaching trigger
@@ -97,7 +105,10 @@ normally does interactively haven't been done yet:
 - **Left thumbstick**: move (relative to where you're looking)
 - **Right thumbstick (flick left/right)**: snap turn
 - **Swing your hands**: momentum melee - the faster you swing, the harder you hit
-- **Hold A (right controller)**: fly, once Ingot has taught you how
+- **Hold either trigger near a grabbable object** (e.g. the morningstar on the school roof): pick
+  it up; release the trigger to drop or throw it
+- **Hold A (right controller)**: fly, once Ingot has taught you how - your floppy limbs flail in
+  the "wind" while airborne
 - **Walk into Ingot and hold A** for ~1.5 seconds: unlocks flight
 
 ## Known limitations

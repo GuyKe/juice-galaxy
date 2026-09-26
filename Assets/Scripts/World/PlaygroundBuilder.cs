@@ -72,7 +72,7 @@ namespace JuiceGalaxy
         static void BuildStoneLipsWall(Transform root, Vector3 localOffset)
         {
             var mat = MaterialUtil.CreateLit(Color.white, MaterialUtil.CreateStoneLipsTexture());
-            PrimBuilder.Cube(root, "StoneLipsWall", localOffset + new Vector3(0, 1.9f, 0), new Vector3(4f, 3.8f, 0.5f), mat);
+            PrimBuilder.Cube(root, "StoneLipsWall", localOffset + new Vector3(0, 6.5f, 0), new Vector3(14f, 13f, 1.2f), mat);
         }
 
         static void BuildObelisk(Transform root, Vector3 localOffset, float height)

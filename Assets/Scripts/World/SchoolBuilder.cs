@@ -4,9 +4,10 @@ using UnityEngine;
 namespace JuiceGalaxy
 {
     /// <summary>
-    /// Builds the school: deep red mottled walls with a flat dark overhanging roof and plain dark
-    /// window cutouts on the outside, a teal/blue checkered floor, rows of desks and a blank
-    /// blackboard on the inside. Sits on a sealed, empty first floor the player can't get into.
+    /// Builds the school: deep red mottled walls with a flat dark overhanging roof (topped with a
+    /// grabbable morningstar) and plain dark window cutouts on the outside, a teal/blue checkered
+    /// floor, rows of desks and a blank blackboard on the inside. Sits on a sealed, empty first
+    /// floor the player can't get into.
     /// </summary>
     public static class SchoolBuilder
     {
@@ -37,6 +38,10 @@ namespace JuiceGalaxy
             PrimBuilder.Plane(root, "Floor", Vector3.zero, new Vector2(length, depth), floorMat);
             const float roofOverhang = 0.7f;
             PrimBuilder.Cube(root, "Roof", new Vector3(0, height, 0), new Vector3(length + roofOverhang, thickness, depth + roofOverhang), roofMat);
+
+            // A morningstar rests on the roof - grab it with a controller trigger to wield it.
+            Vector3 roofSpawnPoint = root.TransformPoint(new Vector3(2.5f, height + thickness / 2f + 0.1f, 1.5f));
+            MorningstarProp.Spawn(root, roofSpawnPoint);
 
             // A sealed, empty first floor beneath the classroom - solid on every side, so it's
             // just there to ground the building and can't actually be entered.
