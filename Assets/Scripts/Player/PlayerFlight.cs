@@ -7,6 +7,9 @@ namespace JuiceGalaxy
     /// is set, holding the right controller's A button lifts and propels the player forward
     /// in their look direction; releasing lets gravity resume smoothly. While airborne, the
     /// player's floppy limbs get blown backward by "wind" so the whole body ragdolls/flails.
+    /// Flight doesn't cost Juice - Juice doubles as your health pool, so making flight also
+    /// consume it meant getting hit (which drains Juice) could silently ground you, making flight
+    /// feel randomly broken.
     /// </summary>
     public class PlayerFlight : MonoBehaviour
     {
@@ -17,7 +20,6 @@ namespace JuiceGalaxy
         public float lift = 3.2f;
         public float forwardThrust = 2.4f;
         public float maxFlightSpeed = 6f;
-        public float juiceDrainPerSecond = 6f;
 
         /// <summary>The player's floppy limb chains - blown backward by "wind" while flying so the
         /// whole floppy body ragdolls/flails instead of just trailing limply.</summary>
@@ -37,7 +39,7 @@ namespace JuiceGalaxy
         {
             if (rig == null || controller == null) return;
 
-            bool wantsToFly = juice != null && juice.flightUnlocked && rig.flyButtonAction.IsPressed() && juice.currentJuice > 0f;
+            bool wantsToFly = juice != null && juice.flightUnlocked && rig.flyButtonAction.IsPressed();
 
             if (wantsToFly)
             {
@@ -49,7 +51,6 @@ namespace JuiceGalaxy
 
                 controller.ApplyFlightMotion(_flightVelocity * Time.deltaTime);
                 controller.verticalVelocity = 0f;
-                juice.Drain(juiceDrainPerSecond * Time.deltaTime);
             }
             else if (controller.isFlying)
             {

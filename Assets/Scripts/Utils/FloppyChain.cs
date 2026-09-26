@@ -72,6 +72,11 @@ namespace JuiceGalaxy
                 rb.mass = segmentMass;
                 rb.drag = 1.5f;
                 rb.angularDrag = 4f;
+                // The anchor is kinematic and moved via MovePosition, which doesn't reliably wake a
+                // sleeping connected body through its SpringJoint - segments that had gone still for
+                // a moment could then just sit there "frozen" even as the hand kept moving. Disabling
+                // sleep on them entirely (see also the explicit WakeUp() below) keeps them responsive.
+                rb.sleepThreshold = 0f;
                 chain.segments[i] = rb;
 
                 var joint = segGo.AddComponent<SpringJoint>();
@@ -106,6 +111,7 @@ namespace JuiceGalaxy
             foreach (var segment in segments)
             {
                 if (segment == null) continue;
+                segment.WakeUp();
                 if (segment.velocity.sqrMagnitude > maxSqr)
                     segment.velocity = segment.velocity.normalized * maxSegmentSpeed;
             }

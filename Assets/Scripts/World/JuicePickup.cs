@@ -2,7 +2,10 @@ using UnityEngine;
 
 namespace JuiceGalaxy
 {
-    /// <summary>A small glowing orb of Juice that floats, bobs, and refills the player's resource on touch.</summary>
+    /// <summary>
+    /// A small glowing orb of Juice that floats and bobs until the player gets close, then flies
+    /// toward them and is collected - like a Minecraft XP orb.
+    /// </summary>
     [RequireComponent(typeof(SphereCollider))]
     public class JuicePickup : MonoBehaviour
     {
@@ -11,7 +14,14 @@ namespace JuiceGalaxy
         public float bobHeight = 0.1f;
         public float spinSpeed = 90f;
 
+        public float magnetRange = 4f;
+        public float magnetAcceleration = 30f;
+        public float maxMagnetSpeed = 16f;
+        public float collectDistance = 0.5f;
+
         Vector3 _basePos;
+        bool _magnetized;
+        float _magnetSpeed;
 
         void Start()
         {
@@ -21,6 +31,25 @@ namespace JuiceGalaxy
 
         void Update()
         {
+            var player = GameManager.Instance != null ? GameManager.Instance.player : null;
+
+            if (player != null)
+            {
+                Vector3 target = player.position + Vector3.up;
+                float dist = Vector3.Distance(transform.position, target);
+                if (!_magnetized && dist < magnetRange) _magnetized = true;
+
+                if (_magnetized)
+                {
+                    _magnetSpeed = Mathf.Min(maxMagnetSpeed, _magnetSpeed + magnetAcceleration * Time.deltaTime);
+                    transform.position = Vector3.MoveTowards(transform.position, target, _magnetSpeed * Time.deltaTime);
+                    transform.Rotate(Vector3.up, spinSpeed * 3f * Time.deltaTime, Space.World);
+
+                    if (dist <= collectDistance) Collect(player);
+                    return;
+                }
+            }
+
             transform.position = _basePos + Vector3.up * Mathf.Sin(Time.time * bobSpeed) * bobHeight;
             transform.Rotate(Vector3.up, spinSpeed * Time.deltaTime, Space.World);
         }
@@ -30,6 +59,13 @@ namespace JuiceGalaxy
             var juice = other.GetComponentInParent<JuiceSystem>();
             if (juice == null) return;
             juice.AddJuice(amount);
+            Destroy(gameObject);
+        }
+
+        void Collect(Transform player)
+        {
+            var juice = player.GetComponentInParent<JuiceSystem>();
+            if (juice != null) juice.AddJuice(amount);
             Destroy(gameObject);
         }
 

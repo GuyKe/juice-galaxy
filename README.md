@@ -36,12 +36,15 @@ imported art assets to go stale or break.
   force proportional to your flight speed, so your whole floppy body flails instead of just
   trailing limply (`PlayerFlight.cs`).
 - **Juice**: one resource that is simultaneously your health pool and your progression currency
-  (`JuiceSystem.cs`). Crates drop Juice pickups; combat, getting crushed, or touching the spiked
-  mine drains it.
+  (`JuiceSystem.cs`). Crates drop Juice pickups that float toward and get collected by you once
+  you're in range - like a Minecraft XP orb (`JuicePickup.cs`); combat, getting crushed, or
+  touching the spiked mine drains it.
 - **Flight**: locked until Ingot teaches you. The first time you approach him he says "There's a
   cool toy on top of the school, hold A to fly." for 6 seconds. Afterward, hold the right
   controller's **A** button near him for ~1.5s (any time, no on-screen countdown) to unlock flight,
-  then hold **A** anywhere to fly in your look direction (`PlayerFlight.cs`, `IngotFlightTutor.cs`).
+  then hold **A** anywhere to fly in your look direction, with no ongoing Juice cost - Juice
+  doubles as your health, so charging flight against it meant taking damage could silently ground
+  you (`PlayerFlight.cs`, `IngotFlightTutor.cs`).
 - **The school**: a low-poly schoolhouse - deep red mottled walls, a flat dark roof that overhangs
   the walls on every side (with a grabbable morningstar resting on top), five plain dark cut-out
   windows, and a real walk-through doorway (not just a decal) leading to a teal/blue checkered
