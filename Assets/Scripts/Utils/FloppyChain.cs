@@ -20,12 +20,12 @@ namespace JuiceGalaxy
         // the SpringJoints see a huge sudden stretch and fire back a violent corrective force,
         // flinging segments into glitchy tangled poses. Capping how far the anchor can move per
         // step - and clamping segment speed as a second safety net - keeps that bounded.
-        public float maxAnchorSpeed = 12f;
-        public float maxSegmentSpeed = 10f;
+        public float maxAnchorSpeed = 18f;
+        public float maxSegmentSpeed = 16f;
 
         public static FloppyChain Build(Transform parent, string name, Transform driver, int segmentCount,
             float segmentLength, float startRadius, float endRadius, Material material,
-            float spring = 900f, float damper = 12f, float segmentMass = 0.4f, bool blocky = false)
+            float spring = 1400f, float damper = 16f, float segmentMass = 0.4f, bool blocky = false)
         {
             var root = new GameObject(name);
             root.transform.SetParent(parent, false);
@@ -66,8 +66,8 @@ namespace JuiceGalaxy
 
                 var rb = segGo.AddComponent<Rigidbody>();
                 rb.mass = segmentMass;
-                rb.drag = 1.5f;
-                rb.angularDrag = 4f;
+                rb.drag = 1.1f;
+                rb.angularDrag = 3f;
                 // The anchor is kinematic and moved via MovePosition, which doesn't reliably wake a
                 // sleeping connected body through its SpringJoint - segments that had gone still for
                 // a moment could then just sit there "frozen" even as the hand kept moving. Disabling

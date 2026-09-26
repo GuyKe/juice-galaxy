@@ -38,6 +38,7 @@ namespace JuiceGalaxy
             BuildFists(xrRig, playerGo);
             BuildHandGrabbers(xrRig, playerGo);
             DisableSelfCollisions(controller, flight.windChains);
+            WireKnockback(playerGo.transform, health, floppyController);
 
             var gm = GameManager.Instance;
             if (gm != null) gm.RegisterPlayer(playerGo.transform, juice, health, xrRig.headCamera);
@@ -99,6 +100,22 @@ namespace JuiceGalaxy
 
             var hitbox = fist.AddComponent<MomentumMeleeHitbox>();
             hitbox.owner = owner;
+        }
+
+        /// <summary>
+        /// Shoves the player's floppy body away from whatever hit them - crates crushing you,
+        /// the spike hazard, an enemy - the "active ragdoll" reaction the reference game gets from
+        /// simulating the whole body, translated to a CharacterController via a decaying impulse.
+        /// </summary>
+        static void WireKnockback(Transform playerRoot, Health health, FloppyPlayerController floppyController)
+        {
+            health.OnDamaged += (amount, hitPoint) =>
+            {
+                Vector3 dir = playerRoot.position - hitPoint;
+                dir.y = 0f;
+                if (dir.sqrMagnitude < 0.01f) dir = -playerRoot.forward;
+                floppyController.ApplyImpulse(dir.normalized * Mathf.Min(amount * 0.15f, 4f));
+            };
         }
 
         static void BuildHandGrabbers(XRInputRig rig, GameObject owner)

@@ -15,7 +15,13 @@ namespace JuiceGalaxy
         public float minSpeedToHurt = 1.2f;
         public float maxDamage = 60f;
         public float hitCooldown = 0.35f;
-        public float knockbackForce = 4f;
+        public float knockbackForce = 6f;
+        // Newton's third law, VR-safe version: a solid swing should shove your own floppy body back
+        // a little too, not just the thing you hit - part of what sells the reference game's
+        // "active ragdoll" feel. Kept small since this only nudges the CharacterController, never
+        // the camera.
+        public float ownerRecoil = 1.2f;
+        FloppyPlayerController _ownerController;
 
         Vector3 _lastPos;
         Vector3 _velocity;
@@ -72,6 +78,12 @@ namespace JuiceGalaxy
             if (rb != null && !rb.isKinematic)
             {
                 rb.AddForceAtPosition(_velocity.normalized * knockbackForce * Mathf.Clamp01(speed / 6f), transform.position, ForceMode.Impulse);
+            }
+
+            if (_ownerController == null && owner != null) _ownerController = owner.GetComponent<FloppyPlayerController>();
+            if (_ownerController != null)
+            {
+                _ownerController.ApplyImpulse(-_velocity.normalized * ownerRecoil * Mathf.Clamp01(speed / 6f));
             }
         }
     }

@@ -7,6 +7,11 @@ namespace JuiceGalaxy
     /// turning, gravity/ground handling, and a CharacterController height that follows the
     /// headset so crouching in real life crouches in-game. Hands off vertical motion to
     /// PlayerFlight while flying.
+    ///
+    /// Also carries a decaying knockback impulse (see ApplyImpulse) so hits, crushes and your own
+    /// swings can physically shove the body around - the closest a VR CharacterController can
+    /// safely get to an "active ragdoll" feel without ever touching head tracking, which has to
+    /// stay purely HMD-driven for comfort.
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
     public class FloppyPlayerController : MonoBehaviour
@@ -19,11 +24,22 @@ namespace JuiceGalaxy
         public float minHeight = 0.5f;
         public float maxHeight = 2.2f;
 
+        // How fast a knockback impulse fades - high enough that a shove reads as a brief jolt
+        // rather than a sustained, comfort-wrecking fling.
+        public float externalVelocityDrag = 7f;
+
         [HideInInspector] public bool isFlying;
         [HideInInspector] public float verticalVelocity;
+        [HideInInspector] public Vector3 externalVelocity;
 
         CharacterController _controller;
         float _lastSnapTurnTime;
+
+        /// <summary>Shoves the body with a one-off velocity that decays over the next moment or two.</summary>
+        public void ApplyImpulse(Vector3 impulse)
+        {
+            externalVelocity += impulse;
+        }
 
         public void Init(XRInputRig inputRig)
         {
@@ -83,7 +99,11 @@ namespace JuiceGalaxy
 
             Vector3 motion = horizontal;
             motion.y = isFlying ? 0f : verticalVelocity;
+            motion += externalVelocity;
             _controller.Move(motion * Time.deltaTime);
+
+            externalVelocity = Vector3.Lerp(externalVelocity, Vector3.zero, externalVelocityDrag * Time.deltaTime);
+            if (externalVelocity.sqrMagnitude < 0.0025f) externalVelocity = Vector3.zero;
         }
 
         public void ApplyFlightMotion(Vector3 worldMotion)
