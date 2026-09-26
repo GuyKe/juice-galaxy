@@ -20,12 +20,12 @@ namespace JuiceGalaxy
         // the SpringJoints see a huge sudden stretch and fire back a violent corrective force,
         // flinging segments into glitchy tangled poses. Capping how far the anchor can move per
         // step - and clamping segment speed as a second safety net - keeps that bounded.
-        public float maxAnchorSpeed = 18f;
-        public float maxSegmentSpeed = 16f;
+        public float maxAnchorSpeed = 14f;
+        public float maxSegmentSpeed = 12f;
 
         public static FloppyChain Build(Transform parent, string name, Transform driver, int segmentCount,
             float segmentLength, float startRadius, float endRadius, Material material,
-            float spring = 1400f, float damper = 16f, float segmentMass = 0.4f, bool blocky = false)
+            float spring = 1100f, float damper = 14f, float segmentMass = 0.4f, bool blocky = false)
         {
             var root = new GameObject(name);
             root.transform.SetParent(parent, false);
@@ -66,8 +66,8 @@ namespace JuiceGalaxy
 
                 var rb = segGo.AddComponent<Rigidbody>();
                 rb.mass = segmentMass;
-                rb.drag = 1.1f;
-                rb.angularDrag = 3f;
+                rb.drag = 1.3f;
+                rb.angularDrag = 3.5f;
                 // The anchor is kinematic and moved via MovePosition, which doesn't reliably wake a
                 // sleeping connected body through its SpringJoint - segments that had gone still for
                 // a moment could then just sit there "frozen" even as the hand kept moving. Disabling
@@ -132,13 +132,37 @@ namespace JuiceGalaxy
 
             if (segments == null) return;
             float maxSqr = maxSegmentSpeed * maxSegmentSpeed;
+            Vector3 lastGoodPos = anchor.position;
             foreach (var segment in segments)
             {
                 if (segment == null) continue;
                 segment.WakeUp();
-                if (segment.velocity.sqrMagnitude > maxSqr)
+
+                // A stiff spring joint can occasionally hand back a NaN/huge velocity from a single
+                // solver step (e.g. a very fast hand swing overstretching it); left alone that
+                // corrupts the Rigidbody's position permanently, and the limb reads as "frozen"
+                // forever after since nothing else ever touches its transform again. Snap it back
+                // onto the chain instead of leaving it broken.
+                if (!IsFinite(segment.velocity) || !IsFinite(segment.transform.position))
+                {
+                    segment.velocity = Vector3.zero;
+                    segment.angularVelocity = Vector3.zero;
+                    segment.position = lastGoodPos;
+                }
+                else if (segment.velocity.sqrMagnitude > maxSqr)
+                {
                     segment.velocity = segment.velocity.normalized * maxSegmentSpeed;
+                }
+
+                lastGoodPos = segment.position;
             }
+        }
+
+        static bool IsFinite(Vector3 v)
+        {
+            return !float.IsNaN(v.x) && !float.IsInfinity(v.x)
+                && !float.IsNaN(v.y) && !float.IsInfinity(v.y)
+                && !float.IsNaN(v.z) && !float.IsInfinity(v.z);
         }
 
         public Vector3 TipVelocity => segments != null && segments.Length > 0 ? segments[segments.Length - 1].velocity : Vector3.zero;
