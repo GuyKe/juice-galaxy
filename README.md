@@ -39,12 +39,9 @@ imported art assets to go stale or break.
   (`JuiceSystem.cs`). Crates drop Juice pickups; combat, getting crushed, or touching the spiked
   mine drains it.
 - **Flight**: locked until Ingot teaches you. The first time you approach him he says "There's a
-  cool toy on top of the school, hold A to fly." for 6 seconds - the camera cuts to a close-up on
-  his face for exactly that window, then cuts back to your normal first-person view. Afterward,
-  hold the right controller's **A** button near him for ~1.5s (any time, no on-screen countdown) to
-  unlock flight, then hold **A** anywhere to fly in your look direction (`PlayerFlight.cs`,
-  `IngotFlightTutor.cs`). The cutscene is scoped to that one bounded line rather than an open-ended
-  waiting prompt, since freezing real head tracking indefinitely would be a real VR discomfort risk.
+  cool toy on top of the school, hold A to fly." for 6 seconds. Afterward, hold the right
+  controller's **A** button near him for ~1.5s (any time, no on-screen countdown) to unlock flight,
+  then hold **A** anywhere to fly in your look direction (`PlayerFlight.cs`, `IngotFlightTutor.cs`).
 - **The school**: a low-poly schoolhouse - deep red mottled walls, a flat dark roof that overhangs
   the walls on every side (with a grabbable morningstar resting on top), five plain dark cut-out
   windows, and a real walk-through doorway (not just a decal) leading to a teal/blue checkered
@@ -125,8 +122,7 @@ normally does interactively haven't been done yet:
   keeping with the chunky, fever-dream aesthetic of the reference screenshot.
 - There's no full-body/leg IK, save/load, or menu system yet - this is a playable core loop, not a
   finished, content-complete game.
-- Ingot's dialogue camera cut (`IngotFlightTutor.cs`) briefly disables and overrides the HMD's
-  TrackedPoseDriver to frame a close-up, then hands tracking back. This follows the Input System's
-  documented APIs and is designed to be short and comfort-conscious, but VR camera overrides are
-  inherently hard to fully validate without a headset - worth a specific look on-device, and easy
-  to disable (skip calling `UpdateCameraFocus`) if it feels off.
+- An earlier build tried cutting the camera to a close-up on Ingot's face during his line by
+  briefly overriding the HMD's TrackedPoseDriver. It was removed after it broke flight (which also
+  reads head orientation) - a good example of how hard VR camera overrides are to validate without
+  a headset. Ingot's dialogue is text-only for now.

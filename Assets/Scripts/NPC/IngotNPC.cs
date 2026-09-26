@@ -64,9 +64,9 @@ namespace JuiceGalaxy
             AddCappedLimb(root, "RightLeg", rightHip, 3, 0.15f * scale, 0.08f * scale, 0.05f * scale, darkMat, whiteMat);
             AddCappedLimb(root, "Tail", tailRoot, 3, 0.13f * scale, 0.05f * scale, 0.02f * scale, darkMat, whiteMat);
 
-            var label = WorldSpaceLabel.Create(body, new Vector3(0, 0.95f * scale, 0), "Ingot", new Color(0.95f, 0.9f, 0.8f));
+            var label = WorldSpaceLabel.Create(body, new Vector3(0, 0.95f * scale, 0), "Ingot", new Color(0.95f, 0.9f, 0.8f), 40, 0.15f);
 
-            var promptLabel = WorldSpaceLabel.Create(body, new Vector3(0, 0.72f * scale, 0), "", Color.white, 32, 0.2f);
+            var promptLabel = WorldSpaceLabel.Create(body, new Vector3(0, 0.72f * scale, 0), "", Color.white, 26, 0.1f);
             promptLabel.SetVisible(false);
 
             var trigger = root.gameObject.AddComponent<SphereCollider>();
@@ -79,7 +79,6 @@ namespace JuiceGalaxy
 
             var tutor = root.gameObject.AddComponent<IngotFlightTutor>();
             tutor.promptLabel = promptLabel;
-            tutor.facePoint = head;
 
             return root;
         }
